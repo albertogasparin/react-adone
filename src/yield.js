@@ -16,8 +16,8 @@ export class Yield extends Component {
   };
 
   basket = null;
+  basketState = null;
   shouldUpdate = false;
-  state = {};
 
   componentWillUnmount() {
     this.shouldUpdate = false;
@@ -30,9 +30,9 @@ export class Yield extends Component {
   }
 
   onUpdate = () => {
-    let prevState = this.state;
-    this.state = this.getBasketState();
-    if (this.shouldUpdate && !shallowEqual(this.state, prevState)) {
+    let prevState = this.basketState;
+    this.basketState = this.getBasketState();
+    if (this.shouldUpdate && !shallowEqual(this.basketState, prevState)) {
       this.forceUpdate();
     }
   };
@@ -67,7 +67,7 @@ export class Yield extends Component {
       );
     }
 
-    return children(this.state, this.basket.actions);
+    return children(this.basketState, this.basket.actions);
   }
 }
 
