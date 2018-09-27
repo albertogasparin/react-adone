@@ -1,9 +1,10 @@
 import immer from "immer";
 
-export function createState(initialState) {
+export function createState(initialState, key) {
   let listeners = [];
   let currentState = initialState;
   return {
+    key,
     get() {
       return currentState;
     },
@@ -27,12 +28,10 @@ export function updateState(target, updater) {
 }
 
 export function bindActions(actions, store) {
+  const getState = () => store.get();
+  const mutate = fn => updateState(store, fn);
   return Object.keys(actions).reduce((acc, k) => {
-    acc[k] = (...args) => {
-      const getState = () => store.get();
-      const dispatch = updateState.bind(null, store);
-      return actions[k](...args)(dispatch, getState);
-    };
+    acc[k] = (...args) => actions[k](...args)(mutate, getState);
     return acc;
   }, {});
 }
