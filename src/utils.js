@@ -21,17 +21,24 @@ export function createState(initialState, key) {
   };
 }
 
-export function updateState(target, updater) {
-  let currState = target.get();
-  let nextState = immer(currState, updater);
-  if (nextState !== currState) target.set(nextState);
-}
+const updateMiddleware = target => getState => next => fn => {
+  const state = getState();
+  const nextState = next(state, fn);
+  if (nextState !== state) {
+    target.set(nextState);
+  }
+};
 
-export function bindActions(actions, store) {
+export function bindActions(actions, store, middlewares) {
   const getState = () => store.get();
-  const mutate = fn => updateState(store, fn);
+  const produce = [...middlewares, updateMiddleware(store)]
+    .reverse()
+    .reduce((next, mw) => {
+      return mw(getState)(next);
+    }, immer);
+
   return Object.keys(actions).reduce((acc, k) => {
-    acc[k] = (...args) => actions[k](...args)(mutate, getState);
+    acc[k] = (...args) => actions[k](...args)(produce, getState);
     return acc;
   }, {});
 }

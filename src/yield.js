@@ -5,6 +5,7 @@ import { createState, bindActions } from "./utils";
 
 export const defaultCtxValue = {
   baskets: {},
+  middlewares: [],
   addBasket: (key, basket) => (defaultCtxValue.baskets[key] = basket)
 };
 
@@ -64,10 +65,10 @@ export class Yield extends Component {
       // because context API doesn't have builtin selectors (yet)
       return (
         <Consumer>
-          {({ baskets, addBasket }) => {
+          {({ baskets, middlewares, addBasket }) => {
             let basket = baskets[from.key];
             if (!basket) {
-              basket = this.createBasket();
+              basket = this.createBasket(middlewares);
               addBasket(from.key, basket);
             }
             this.setBasket(basket);
@@ -85,10 +86,15 @@ export class Yield extends Component {
 }
 
 export class YieldProvider extends Component {
+  static defaultProps = {
+    middlewares: []
+  };
+
   constructor(props) {
     super(props);
     this.state = {
       baskets: {},
+      middlewares: this.props.middlewares,
       addBasket: this.addBasket
     };
   }

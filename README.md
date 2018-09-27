@@ -9,14 +9,12 @@
 export const key = "counter";
 
 export const defaultState = {
-  data: {
-    count: 0,
-  },
+  count: 0,
 };
 
 export const actions = {
-  increment: () => (dispatch) => {
-    dispatch(draft => { draft.data.count += 1 });
+  increment: () => (produce) => {
+    produce(draft => { draft.count += 1 });
   }
 }
 ```
@@ -30,10 +28,10 @@ const App = () => (
   <YieldProvider>
     <h1>My counter</h1>
     <Yield from={counterBasket}>
-      {({ data }, actions) => (
+      {({ count, increment }) => (
         <div>
-          {data.count}
-          <button onClick={actions.increment}>+</button>
+          {count}
+          <button onClick={increment}>+</button>
         </div>
       )}
     </Yield>
@@ -49,17 +47,17 @@ const App = () => (
 // baskets/todos.js
 // ...
 export const actions = {
-  load: () => async (dispatch, getState) => {
+  load: () => async (produce, getState) => {
     if (getState().loading === true) return;
-    dispatch(draft => {
+    produce(draft => {
       draft.loading = true;
     });
     
     const todos = await fetch('/todos').then(r => r.json());
-    dispatch(draft => {
+    produce(draft => {
       draft.loading = false;
       draft.error = null;
-      draft.data.todos = todos;
+      draft.data = { todos };
     });
   }
 };
@@ -81,12 +79,57 @@ class TodosList extends Component {
 
 export const YieldTodosList = () => (
   <Yield from={todosBasket}>
-    {({ data }, actions) => (
-      <TodosList todos={data.todos} onLoad={actions.load} />
+    {({ data, loading, error, load }) => (
+      <TodosList todos={data.todos} onLoad={load} />
     )}
   </Yield>
 );
 ```
+
+#### Middlewares
+
+```js
+// app.js
+import { YieldProvider, Yield } from 'react-adone';
+import * as counterBasket from './baskets/counter';
+
+const logger = getState => next => fn => {
+  console.log("prev state", getState());
+  next(fn);
+  console.log("next state", getState());
+};
+
+const App = () => (
+  <YieldProvider middlewares={[logger]}>
+    <h1>App</h1>
+    <Yield from={counterBasket}>
+      {({ count, increment }) => (/**/)}
+    </Yield>
+  </YieldProvider>
+)
+```
+
+#### Composition
+
+```js
+import Composer from "react-composer";
+// ...
+
+const UserProject = () => (
+  <Composer
+    components={[
+      <Yield from={userBasket} />,
+      <Yield from={projectBasket} />
+    ]}
+  >
+    {([user, project]) => (
+      /* here you can have a component that triggers user.load() 
+         and when user data is returned calls project.load(user.data.id) */
+    )}
+  </Composer>
+);
+```
+
 
 ## Optimisations
 
@@ -123,7 +166,7 @@ import * as counterBasket from './baskets/counter';
 
 export const ButtonIncrement = () => (
   <Yield from={counterBasket} pick={null}>
-    {(__, actions) => (
+    {({ actions }) => (
       <button onClick={actions.increment}>+</button>
     )}
   </Yield>
