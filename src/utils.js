@@ -1,14 +1,14 @@
 import immer from "immer";
 
-export function createState(initialState, key) {
+export function createStore(initialState, key) {
   let listeners = [];
   let currentState = initialState;
   return {
     key,
-    get() {
+    getState() {
       return currentState;
     },
-    set(nextState) {
+    setState(nextState) {
       currentState = nextState;
       listeners.forEach(listener => listener());
     },
@@ -21,24 +21,25 @@ export function createState(initialState, key) {
   };
 }
 
-const updateMiddleware = target => getState => next => fn => {
-  const state = getState();
-  const nextState = next(state, fn);
+const updateMiddleware = store => next => fn => {
+  const changes = [];
+  const state = store.getState();
+  const nextState = next(state, fn, patches => {
+    changes.push(...patches);
+  });
   if (nextState !== state) {
-    target.set(nextState);
+    store.setState(nextState);
   }
+  return { changes };
 };
 
 export function bindActions(actions, store, middlewares) {
-  const getState = () => store.get();
-  const produce = [...middlewares, updateMiddleware(store)]
+  const produce = [...middlewares, updateMiddleware]
     .reverse()
-    .reduce((next, mw) => {
-      return mw(getState)(next);
-    }, immer);
+    .reduce((next, mw) => mw(store)(next), immer);
 
   return Object.keys(actions).reduce((acc, k) => {
-    acc[k] = (...args) => actions[k](...args)(produce, getState);
+    acc[k] = (...args) => actions[k](...args)(produce, store.getState);
     return acc;
   }, {});
 }

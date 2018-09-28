@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 
 import shallowEqual from "fbjs/lib/shallowEqual";
-import { createState, bindActions } from "./utils";
+import { createStore, bindActions } from "./utils";
 
 export const defaultCtxValue = {
   baskets: {},
@@ -26,13 +26,13 @@ export class Yield extends Component {
   }
 
   componentWillUnmount() {
-    this.basket.state.off(this.onUpdate);
+    this.basket.store.off(this.onUpdate);
     this.basket = null;
   }
 
   getBasketState() {
     const { pick } = this.props;
-    return pick ? pick(this.basket.state.get()) : {};
+    return pick ? pick(this.basket.store.getState()) : {};
   }
 
   onUpdate = isMount => {
@@ -47,14 +47,14 @@ export class Yield extends Component {
 
   createBasket(middlewares) {
     const { from } = this.props;
-    const state = createState(from.defaultState, from.key);
-    const actions = bindActions(from.actions, state, middlewares);
-    return { state, actions };
+    const store = createStore(from.defaultState, from.key);
+    const actions = bindActions(from.actions, store, middlewares);
+    return { store, actions };
   }
 
   setBasket(basket) {
     this.basket = basket;
-    this.basket.state.on(this.onUpdate);
+    this.basket.store.on(this.onUpdate);
   }
 
   render() {

@@ -93,10 +93,11 @@ export const YieldTodosList = () => (
 import { YieldProvider, Yield } from 'react-adone';
 import * as counterBasket from './baskets/counter';
 
-const logger = getState => next => fn => {
-  console.log("prev state", getState());
-  next(fn);
-  console.log("next state", getState());
+const logger = store => next => fn => {
+  console.log("Updating", store.key);
+  const result = next(fn);
+  console.log("Changed", result.changes);
+  return result;
 };
 
 const App = () => (
