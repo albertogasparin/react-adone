@@ -1,11 +1,8 @@
 {
   "name": "react-adone",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "State management for React build on top of immer and Context (optional)",
   "main": "lib/index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
   "repository": {
     "type": "git",
     "url": "git+https://albertogasparin@github.com/albertogasparin/react-adone.git"
@@ -16,8 +13,26 @@
     "url": "https://github.com/albertogasparin/react-adone/issues"
   },
   "homepage": "https://github.com/albertogasparin/react-adone#readme",
+  "scripts": {
+    "build": "babel src/ -d lib/",
+    "test": "jest",
+    "flow": "flow",
+    "prepublish": "npm run test & npm run build"
+  },
+  "dependencies": {
+    "immer": "~1.7.2"
+  },
   "devDependencies": {
+    "babel-cli": "~6.26.0",
+    "babel-eslint": "~10.0.1",
+    "babel-preset-flow": "~6.23.0",
+    "enzyme": "~3.6.0",
+    "enzyme-adapter-react-16": "~1.5.0",
     "eslint": "~5.6.0",
+    "eslint-plugin-flowtype": "~2.50.3",
+    "eslint-plugin-react": "~7.11.1",
+    "flow-bin": "~0.81.0",
+    "jest": "~23.6.0",
     "prettier": "~1.14.3"
   }
 }
