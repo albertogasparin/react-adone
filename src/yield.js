@@ -15,15 +15,15 @@ import type {
   Middleware,
 } from './types';
 
-export const defaultCtxValue: YieldProviderState = {
+export const fallbackProviderState: YieldProviderState = {
   baskets: {},
   middlewares: [],
   addBasket(key, basket) {
-    defaultCtxValue.baskets[key] = basket;
+    fallbackProviderState.baskets[key] = basket;
   },
 };
 
-const { Provider, Consumer } = React.createContext(defaultCtxValue);
+const { Provider, Consumer } = React.createContext(fallbackProviderState);
 
 export class Yield extends Component<YieldProps, ?YieldState> {
   static defaultProps = {

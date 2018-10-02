@@ -28,7 +28,7 @@ export type YieldState = {};
 
 export type YieldProps = {
   from: Basket<*>,
-  children: (*) => Element<*>[],
+  children: (*) => Element<*> | null,
   pick: (*) => * | null,
 };
 
