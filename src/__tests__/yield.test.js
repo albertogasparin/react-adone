@@ -4,24 +4,8 @@
 import React from 'react';
 import { shallow, mount } from 'enzyme';
 
-import type { Basket, BasketStore } from '../types';
+import { basketMock, storeMock } from './mocks';
 import { Yield, YieldProvider, fallbackProviderState } from '../yield';
-
-const basketMock: Basket<any> = {
-  key: 'basket.key',
-  defaultState: { count: 0 },
-  actions: {
-    increase: jest.fn(),
-  },
-};
-
-const storeMock: BasketStore<any> = {
-  key: basketMock.key,
-  getState: jest.fn(),
-  setState: jest.fn(),
-  on: jest.fn(),
-  off: jest.fn(),
-};
 
 describe('Yield', () => {
   const fbProviderState = { ...fallbackProviderState };
@@ -100,6 +84,7 @@ describe('Yield', () => {
         expect(children).toHaveBeenCalledWith({
           count: 0,
           increase: expect.any(Function),
+          decrease: expect.any(Function),
         });
       });
     });

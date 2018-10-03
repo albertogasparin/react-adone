@@ -1,11 +1,11 @@
 import combineMiddlewares from './middlewares';
 
-import type { BasketActions } from './types';
+import type { BasketStore, BasketActions, Middleware } from './types';
 
 export default function bindActions(
   actions,
-  store,
-  middlewares
+  store: BasketStore,
+  middlewares: Middleware[]
 ): BasketActions {
   const produce = combineMiddlewares(store, middlewares);
 
