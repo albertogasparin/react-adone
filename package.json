@@ -2,22 +2,31 @@
   "name": "react-adone",
   "version": "0.9.0",
   "description": "State management for React build on top of immer and Context (optional)",
-  "main": "lib/index.js",
+  "keywords": [
+    "React",
+    "immer",
+    "React Context"
+  ],
+  "main": "lib/cjs/index.js",
+  "module": "lib/esm/index.js",
   "repository": {
     "type": "git",
     "url": "git+https://albertogasparin@github.com/albertogasparin/react-adone.git"
   },
-  "author": "",
+  "author": "Alberto Gasparin",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/albertogasparin/react-adone/issues"
   },
   "homepage": "https://github.com/albertogasparin/react-adone#readme",
   "scripts": {
-    "build": "babel src/ -d lib/",
+    "build:cjs": "babel src/ -d lib/cjs --ignore **/__tests__ --presets @babel/env",
+    "build:esm": "babel src/ -d lib/esm --ignore **/__tests__",
+    "build:flow": "flow-copy-source --ignore __tests__/** src lib/esm",
+    "build": "npm run build:cjs -s && npm run build:flow -s && npm run build:esm -s",
     "test": "jest",
     "flow": "flow",
-    "prepublish": "npm run test & npm run build"
+    "prepack": "npm run flow -s && npm run test -s && npm run build -s"
   },
   "dependencies": {
     "immer": "~1.7.2"
@@ -41,6 +50,7 @@
     "eslint-plugin-flowtype": "~2.50.3",
     "eslint-plugin-react": "~7.11.1",
     "flow-bin": "~0.81.0",
+    "flow-copy-source": "~2.0.2",
     "jest": "~23.6.0",
     "prettier": "~1.14.3",
     "react": "~16.5.2",
