@@ -1,6 +1,7 @@
 // @flow
 
-// Mostly copied by fbjs/packages/fbjs/src/core/shallowEqual.js
+// Mostly copied from fbjs/packages/fbjs/src/core/shallowEqual.js
+// inlined because fbjs/shallowEqual might get removed from React
 
 const hasOwnProperty = Object.prototype.hasOwnProperty;
 

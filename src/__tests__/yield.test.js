@@ -1,11 +1,14 @@
 // @flow
 /* eslint-env jest */
 
-import React from 'react';
+import React, { Component } from 'react';
 import { shallow, mount } from 'enzyme';
 
 import { basketMock, storeMock } from './mocks';
 import { Yield, YieldProvider, fallbackProviderState } from '../yield';
+import createStore from '../create-store';
+
+jest.mock('../create-store');
 
 describe('Yield', () => {
   const fbProviderState = { ...fallbackProviderState };
@@ -17,39 +20,46 @@ describe('Yield', () => {
       class YieldProviderMock extends YieldProvider {
         state = { baskets, middlewares: [], addBasket };
       }
-      const Wrapper = (
+      const getElement = () => (
         <YieldProviderMock>
           <Yield from={basketMock}>{children}</Yield>
         </YieldProviderMock>
       );
       const getShallow = () =>
-        shallow(Wrapper)
+        shallow(getElement())
           .childAt(0)
           .shallow();
-      const getMount = () => mount(Wrapper).childAt(0);
-      return { Wrapper, getShallow, getMount, addBasket, baskets, children };
+      const getMount = () => mount(getElement()).childAt(0);
+      return { getElement, getShallow, getMount, addBasket, baskets, children };
     },
     withoutProvider: (baskets = {}) => {
       fallbackProviderState.baskets = baskets;
       fallbackProviderState.addBasket = addBasket;
-      const Wrapper = <Yield from={basketMock}>{children}</Yield>;
-      const getShallow = () => shallow(Wrapper);
-      const getMount = () => mount(Wrapper);
-      return { Wrapper, getShallow, getMount, addBasket, baskets, children };
+      const getElement = () => <Yield from={basketMock}>{children}</Yield>;
+      const getShallow = () => shallow(getElement());
+      const getMount = () => mount(getElement());
+      return { getElement, getShallow, getMount, addBasket, baskets, children };
     },
   };
-
-  afterAll(() => {
-    Object.assign(fallbackProviderState, fbProviderState);
-  });
 
   Object.keys(modes).forEach(key => {
     const setup = modes[key];
     describe(key, () => {
-      it('should render context consumer', () => {
-        const { getShallow } = setup();
+      beforeEach(() => {
+        // $FlowFixMe
+        createStore.mockReturnValue(storeMock);
+        storeMock.getState.mockReturnValue(basketMock.defaultState);
+      });
+
+      afterAll(() => {
+        Object.assign(fallbackProviderState, fbProviderState);
+      });
+
+      it('should render context consumer and not children', () => {
+        const { getShallow, children } = setup();
         const wrapper = getShallow();
         expect(wrapper.name()).toEqual('ContextConsumer');
+        expect(children).not.toHaveBeenCalled();
       });
 
       it('should create a basket if first time', () => {
@@ -69,23 +79,67 @@ describe('Yield', () => {
         expect(addBasket).not.toHaveBeenCalled();
       });
 
-      it('should save basket instance locally', () => {
+      it('should save basket instance locally and listen', () => {
         const { getMount } = setup();
         const instance = getMount().instance();
         expect(instance.basket).toEqual({
           actions: expect.any(Object),
-          store: expect.any(Object),
+          store: storeMock,
         });
+        expect(storeMock.on).toHaveBeenCalledWith(instance.onUpdate);
       });
 
-      it('should render children', () => {
+      it('should render children once', () => {
         const { getMount, children } = setup();
         getMount();
+        expect(children).toHaveBeenCalledTimes(1);
         expect(children).toHaveBeenCalledWith({
           count: 0,
           increase: expect.any(Function),
           decrease: expect.any(Function),
         });
+      });
+
+      it('should update when store calls update listener', () => {
+        const { getMount } = setup();
+        const instance = getMount().instance();
+        instance.forceUpdate = jest.fn();
+        storeMock.getState.mockReturnValue({ count: 1 });
+        instance.onUpdate();
+        expect(instance.state).toEqual({ count: 1 });
+        expect(instance.forceUpdate).toHaveBeenCalled();
+      });
+
+      it('should avoid re-render children just rendered from parent update', () => {
+        const { getElement, children } = setup();
+        class App extends Component<{}> {
+          render() {
+            return getElement();
+          }
+        }
+        const wrapper = mount(<App />);
+        // simulate store change -> parent re-render -> yield listener update
+        storeMock.getState.mockReturnValue({ count: 1 });
+        wrapper.setProps({ foo: 1 });
+        wrapper
+          .find(Yield)
+          .instance()
+          .onUpdate();
+
+        expect(storeMock.getState).toHaveBeenCalledTimes(4);
+        expect(children).toHaveBeenCalledTimes(2);
+        expect(children).toHaveBeenLastCalledWith({
+          count: 1,
+          increase: expect.any(Function),
+          decrease: expect.any(Function),
+        });
+      });
+
+      it('should remove listener from store on unmount', () => {
+        const { getMount } = setup();
+        const wrapper = getMount();
+        wrapper.instance().componentWillUnmount();
+        expect(storeMock.off).toHaveBeenCalled();
       });
     });
   });
