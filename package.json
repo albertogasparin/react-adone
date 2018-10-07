@@ -27,6 +27,7 @@
     "test": "jest",
     "flow": "flow",
     "prepack": "npm run flow -s && npm run test -s && npm run build -s",
+    "preversion": "npm run flow -s && npm run test -s",
     "start": "webpack-dev-server"
   },
   "dependencies": {
