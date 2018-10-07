@@ -1,0 +1,17 @@
+
+# Ignore dev files
+.vscode
+.editorconfig
+.eslintrc.js
+*.config.js
+*.setup.js
+
+# Ignore source files
+src
+
+# Ignore examples
+examples
+
+# Ignore tests
+**/__tests__
+tests
