@@ -26,7 +26,8 @@
     "build": "npm run build:cjs -s && npm run build:flow -s && npm run build:esm -s",
     "test": "jest",
     "flow": "flow",
-    "prepack": "npm run flow -s && npm run test -s && npm run build -s"
+    "prepack": "npm run flow -s && npm run test -s && npm run build -s",
+    "start": "webpack-dev-server"
   },
   "dependencies": {
     "immer": "~1.7.2"
@@ -44,6 +45,7 @@
     "babel-core": "~7.0.0-bridge.0",
     "babel-eslint": "~10.0.1",
     "babel-jest": "~23.6.0",
+    "babel-loader": "~8.0.4",
     "enzyme": "~3.6.0",
     "enzyme-adapter-react-16": "~1.5.0",
     "eslint": "~5.6.0",
@@ -54,6 +56,9 @@
     "jest": "~23.6.0",
     "prettier": "~1.14.3",
     "react": "~16.5.2",
-    "react-dom": "~16.5.2"
+    "react-dom": "~16.5.2",
+    "webpack": "~4.20.2",
+    "webpack-cli": "~3.1.2",
+    "webpack-dev-server": "~3.1.9"
   }
 }
