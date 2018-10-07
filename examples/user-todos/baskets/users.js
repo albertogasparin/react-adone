@@ -11,12 +11,12 @@ const USERS = [{ id: 1, name: 'Bob' }, { id: 2, name: 'Paul' }];
 export const actions = {
   load: () => async (produce, getState) => {
     if (getState().loading) return;
-    produce(draft => {
+    produce(function setLoading(draft) {
       draft.loading = true;
     });
     // simulate async call
     await new Promise(r => setTimeout(r, 1000));
-    produce(draft => {
+    produce(function setData(draft) {
       draft.loading = false;
       draft.data = USERS;
     });

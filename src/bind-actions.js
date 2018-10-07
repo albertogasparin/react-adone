@@ -3,9 +3,16 @@ import type { BasketStore, BasketActions } from './types';
 export default function bindActions(
   actions,
   store: BasketStore<any>
-): BasketActions {
+): BasketActions<any> {
   return Object.keys(actions).reduce((acc, k) => {
-    acc[k] = (...args) => actions[k](...args)(store.produce, store.getState);
+    // Using a custom produce so we can name fn for better debuggability
+    const namedProduce = fn => {
+      Object.defineProperty(fn, 'name', {
+        value: k + (fn.name ? `.${fn.name}` : ''),
+      });
+      store.produce(fn);
+    };
+    acc[k] = (...args) => actions[k](...args)(namedProduce, store.getState);
     return acc;
   }, {});
 }

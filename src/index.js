@@ -1,3 +1,3 @@
 // @flow
 
-export { Yield, YieldProvider } from './yield';
+export { Yield, YieldProvider, fallbackProviderState } from './yield';

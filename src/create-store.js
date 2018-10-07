@@ -1,13 +1,14 @@
 // @flow
 import applyMiddleware from './middlewares';
+import withDevtools from './enhancers/devtools';
 
 import type { BasketStore, Middleware } from './types';
 
-export default function createStore<S>(
+const createStore = (
   key: string,
-  initialState: S,
+  initialState: any,
   middlewares: Middleware[] = []
-): BasketStore<S> {
+): BasketStore<any> => {
   let listeners = [];
   let currentState = initialState;
   const store = {
@@ -29,4 +30,6 @@ export default function createStore<S>(
   };
   store.produce = applyMiddleware(store, middlewares);
   return store;
-}
+};
+
+export default withDevtools(createStore);

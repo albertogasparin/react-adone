@@ -12,13 +12,13 @@ const TODOS = {
 
 export const actions = {
   load: uid => async produce => {
-    produce(draft => {
+    produce(function setLoading(draft) {
       draft.loading = true;
       draft.data = null; // reset
     });
     // simulate async call
     await new Promise(r => setTimeout(r, 1000));
-    produce(draft => {
+    produce(function setData(draft) {
       draft.loading = false;
       draft.data = TODOS[uid];
     });
