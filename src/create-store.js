@@ -19,11 +19,11 @@ export default function createStore<S>(
       currentState = nextState;
       listeners.forEach(listener => listener());
     },
-    on(listener) {
+    subscribe(listener) {
       listeners.push(listener);
-    },
-    off(listener) {
-      listeners = listeners.filter(fn => fn !== listener);
+      return () => {
+        listeners = listeners.filter(fn => fn !== listener);
+      };
     },
     produce: (s): any => s, // makes Flow happy
   };

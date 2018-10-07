@@ -7,12 +7,13 @@ import createStore from './create-store';
 import bindActions from './bind-actions';
 
 import type {
+  BasketStoreUnsubscribe,
+  Middleware,
   YieldBasket,
   YieldProviderProps,
   YieldProviderState,
   YieldProps,
   YieldState,
-  Middleware,
 } from './types';
 
 export const fallbackProviderState: YieldProviderState = {
@@ -30,7 +31,8 @@ export class Yield extends Component<YieldProps, ?YieldState> {
     pick: (state: *) => state,
   };
 
-  basket: ?YieldBasket<*> = null;
+  basket: ?YieldBasket<{}> = null;
+  unsubscribeStore: ?BasketStoreUnsubscribe = null;
   state = null;
 
   componentDidMount() {
@@ -40,9 +42,9 @@ export class Yield extends Component<YieldProps, ?YieldState> {
   }
 
   componentWillUnmount() {
-    if (this.basket) {
-      this.basket.store.off(this.onUpdate);
-      this.basket = null;
+    this.basket = null;
+    if (this.unsubscribeStore) {
+      this.unsubscribeStore();
     }
   }
 
@@ -63,14 +65,14 @@ export class Yield extends Component<YieldProps, ?YieldState> {
 
   createBasket(middlewares: Middleware[]): YieldBasket<*> {
     const { from } = this.props;
-    const store = createStore(from.key, from.defaultState);
-    const actions = bindActions(from.actions, store, middlewares);
+    const store = createStore(from.key, from.defaultState, middlewares);
+    const actions = bindActions(from.actions, store);
     return { store, actions };
   }
 
   setBasket(basket: YieldBasket<*>) {
     this.basket = basket;
-    this.basket.store.on(this.onUpdate);
+    this.unsubscribeStore = this.basket.store.subscribe(this.onUpdate);
   }
 
   render() {

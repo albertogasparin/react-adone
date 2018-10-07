@@ -16,7 +16,6 @@ export const storeMock: BasketStore<{}> = {
   key: basketMock.key,
   getState: jest.fn(),
   setState: jest.fn(),
-  on: jest.fn(),
-  off: jest.fn(),
+  subscribe: jest.fn(),
   produce: jest.fn(),
 };

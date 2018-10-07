@@ -86,7 +86,7 @@ describe('Yield', () => {
           actions: expect.any(Object),
           store: storeMock,
         });
-        expect(storeMock.on).toHaveBeenCalledWith(instance.onUpdate);
+        expect(storeMock.subscribe).toHaveBeenCalledWith(instance.onUpdate);
       });
 
       it('should render children once', () => {
@@ -137,9 +137,12 @@ describe('Yield', () => {
 
       it('should remove listener from store on unmount', () => {
         const { getMount } = setup();
-        const wrapper = getMount();
-        wrapper.instance().componentWillUnmount();
-        expect(storeMock.off).toHaveBeenCalled();
+        const unsubscribeMock = jest.fn();
+        storeMock.subscribe.mockReturnValue(unsubscribeMock);
+        const instance = getMount().instance();
+        expect(instance.unsubscribeStore).toEqual(unsubscribeMock);
+        instance.componentWillUnmount();
+        expect(unsubscribeMock).toHaveBeenCalled();
       });
     });
   });

@@ -5,12 +5,13 @@ import { type Element } from 'react';
 type ProduceFn<S> = S => void | S;
 type SelectorFn<S, T> = S => T;
 
+export type BasketStoreUnsubscribe = () => void;
+
 export type BasketStore<S> = {|
   getState: () => S,
   setState: S => void,
   key: string,
-  on: (listener: () => void) => void,
-  off: (listener: () => void) => void,
+  subscribe: (listener: () => void) => BasketStoreUnsubscribe,
   produce: ProduceFn<S>,
 |};
 

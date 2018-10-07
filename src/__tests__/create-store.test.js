@@ -11,8 +11,7 @@ describe('createStore', () => {
       key: basketMock.key,
       getState: expect.any(Function),
       setState: expect.any(Function),
-      on: expect.any(Function),
-      off: expect.any(Function),
+      subscribe: expect.any(Function),
       produce: expect.any(Function),
     });
   });
@@ -36,7 +35,7 @@ describe('createStore', () => {
       const store = createStore(basketMock.key, basketMock.defaultState);
       const newState = { count: 1 };
       const listener = jest.fn();
-      store.on(listener);
+      store.subscribe(listener);
       store.setState(newState);
       expect(listener).toHaveBeenCalled();
     });
@@ -47,8 +46,8 @@ describe('createStore', () => {
       const store = createStore(basketMock.key, basketMock.defaultState);
       const newState = { count: 1 };
       const listener = jest.fn();
-      store.on(listener);
-      store.off(listener);
+      const unsubscribe = store.subscribe(listener);
+      unsubscribe();
       store.setState(newState);
       expect(listener).not.toHaveBeenCalled();
     });
