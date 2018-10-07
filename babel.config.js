@@ -12,4 +12,9 @@ module.exports = {
     '@babel/plugin-syntax-dynamic-import',
     '@babel/plugin-syntax-import-meta',
   ],
+  env: {
+    test: {
+      presets: ['@babel/preset-env'],
+    },
+  },
 };

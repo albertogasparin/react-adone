@@ -25,6 +25,6 @@ describe('bindActions', () => {
     const result = bindActions(basketMock.actions, storeMock, []);
     result.increase(1);
     expect(basketMock.actions.increase).toHaveBeenCalledWith(1);
-    expect(action2).toHaveBeenCalledWith(produce, storeMock.getState);
+    expect(action2).toHaveBeenCalledWith(storeMock.produce, storeMock.getState);
   });
 });

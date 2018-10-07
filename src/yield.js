@@ -63,7 +63,7 @@ export class Yield extends Component<YieldProps, ?YieldState> {
 
   createBasket(middlewares: Middleware[]): YieldBasket<*> {
     const { from } = this.props;
-    const store = createStore(from.defaultState, from.key);
+    const store = createStore(from.key, from.defaultState);
     const actions = bindActions(from.actions, store, middlewares);
     return { store, actions };
   }

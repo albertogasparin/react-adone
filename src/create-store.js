@@ -1,14 +1,16 @@
 // @flow
+import applyMiddleware from './middlewares';
 
-import type { BasketStore } from './types';
+import type { BasketStore, Middleware } from './types';
 
-export default function createStore<T>(
-  initialState: T,
-  key: string
-): BasketStore<T> {
+export default function createStore<S>(
+  key: string,
+  initialState: S,
+  middlewares: Middleware[] = []
+): BasketStore<S> {
   let listeners = [];
   let currentState = initialState;
-  return {
+  const store = {
     key,
     getState() {
       return currentState;
@@ -23,5 +25,8 @@ export default function createStore<T>(
     off(listener) {
       listeners = listeners.filter(fn => fn !== listener);
     },
+    produce: (s): any => s, // makes Flow happy
   };
+  store.produce = applyMiddleware(store, middlewares);
+  return store;
 }

@@ -1,16 +1,11 @@
-import combineMiddlewares from './middlewares';
-
-import type { BasketStore, BasketActions, Middleware } from './types';
+import type { BasketStore, BasketActions } from './types';
 
 export default function bindActions(
   actions,
-  store: BasketStore,
-  middlewares: Middleware[]
+  store: BasketStore<any>
 ): BasketActions {
-  const produce = combineMiddlewares(store, middlewares);
-
   return Object.keys(actions).reduce((acc, k) => {
-    acc[k] = (...args) => actions[k](...args)(produce, store.getState);
+    acc[k] = (...args) => actions[k](...args)(store.produce, store.getState);
     return acc;
   }, {});
 }

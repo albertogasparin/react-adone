@@ -6,17 +6,21 @@
 
 ```js
 // baskets/counter.js
-export const key = "counter";
+export const key = 'counter';
 
 export const defaultState = {
   count: 0,
 };
 
 export const actions = {
-  increment: () => (produce) => {
-    produce(draft => { draft.count += 1 });
-  }
-}
+  increment: () => produce => {
+    // produce() calls immer after passing through middlewares
+    // the mutation function should return undefined or the entire new state
+    produce(draft => {
+      draft.count += 1;
+    });
+  },
+};
 ```
 
 ```js
@@ -36,7 +40,7 @@ const App = () => (
       )}
     </Yield>
   </YieldProvider>
-)
+);
 ```
 
 ## Advanced usage
@@ -45,21 +49,28 @@ const App = () => (
 
 ```js
 // baskets/todos.js
-// ...
+export const key = 'todos';
+
+export const defaultState = {
+  data: null,
+  loading: false,
+  error: null,
+};
+
 export const actions = {
   load: () => async (produce, getState) => {
     if (getState().loading === true) return;
     produce(draft => {
       draft.loading = true;
     });
-    
+
     const todos = await fetch('/todos').then(r => r.json());
     produce(draft => {
       draft.loading = false;
       draft.error = null;
       draft.data = { todos };
     });
-  }
+  },
 };
 ```
 
@@ -73,14 +84,14 @@ class TodosList extends Component {
     this.props.onLoad();
   }
   render() {
-    return this.props.todos.map(t => <Todo {...t} />)
+    return this.props.todos.map(t => <Todo {...t} />);
   }
 }
 
 export const YieldTodosList = () => (
   <Yield from={todosBasket}>
     {({ data, loading, error, load }) => (
-      <TodosList todos={data.todos} onLoad={load} />
+      <TodosList todos={data ? data.todos : []} onLoad={load} />
     )}
   </Yield>
 );
@@ -124,13 +135,12 @@ const UserProject = () => (
     ]}
   >
     {([user, project]) => (
-      /* here you can have a component that triggers user.load() 
+      /* here you can have a component that triggers user.load()
          and when user data is returned calls project.load(user.data.id) */
     )}
   </Composer>
 );
 ```
-
 
 ## Optimisations
 
@@ -140,7 +150,7 @@ const UserProject = () => (
 // baskets/todos.js
 // ...
 export const selectors = {
-  getTodosCount: state => ({ data: state.data.todos.length })
+  getTodosCount: state => ({ data: state.data.todos.length }),
 };
 ```
 
@@ -151,9 +161,7 @@ import * as todosBasket from './baskets/todos';
 
 export const TodosCount = () => (
   <Yield from={todosBasket} pick={todosBasket.selectors.getTodosCount}>
-    {({ data }) => (
-      <p>You have {data} todos</p>
-    )}
+    {({ data }) => <p>You have {data} todos</p>}
   </Yield>
 );
 ```
@@ -167,11 +175,7 @@ import * as counterBasket from './baskets/counter';
 
 export const ButtonIncrement = () => (
   <Yield from={counterBasket} pick={null}>
-    {({ actions }) => (
-      <button onClick={actions.increment}>+</button>
-    )}
+    {({ actions }) => <button onClick={actions.increment}>+</button>}
   </Yield>
 );
 ```
-
-
