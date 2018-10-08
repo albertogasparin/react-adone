@@ -109,13 +109,14 @@ export class YieldProvider extends Component<
   YieldProviderState
 > {
   static defaultProps = {
+    baskets: {},
     middlewares: [],
   };
 
   constructor(props: YieldProviderProps) {
     super(props);
     this.state = {
-      baskets: {},
+      baskets: this.props.baskets,
       middlewares: this.props.middlewares,
       addBasket: this.addBasket,
     };

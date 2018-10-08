@@ -50,6 +50,7 @@ export type YieldProviderState = {
 };
 
 export type YieldProviderProps = {
+  baskets: { [key: string]: YieldBasket<{}> },
   middlewares: Middleware[],
   children: any,
 };
