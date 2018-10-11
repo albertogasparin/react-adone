@@ -150,7 +150,7 @@ describe('Yield', () => {
 describe('YieldProvider', () => {
   describe('render', () => {
     it('should render context provider with value prop and children', () => {
-      const children = jest.fn();
+      const children = <div />;
       const wrapper = shallow(<YieldProvider>{children}</YieldProvider>);
       expect(wrapper.name()).toEqual('ContextProvider');
       expect(wrapper.props()).toEqual({
@@ -166,7 +166,7 @@ describe('YieldProvider', () => {
 
   describe('addBasket', () => {
     it('should add basket to state', () => {
-      const children = jest.fn();
+      const children = <div />;
       const yieldBasket = { store: storeMock, actions: {} };
       const instance = shallow(
         <YieldProvider>{children}</YieldProvider>
