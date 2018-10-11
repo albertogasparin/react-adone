@@ -1,4 +1,3 @@
-// @flow
 /* eslint-env jest */
 
 import React, { Component } from 'react';

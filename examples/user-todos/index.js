@@ -1,8 +1,8 @@
 // @flow
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
+import { YieldProvider } from 'react-adone';
 
-import { YieldProvider } from '../../src';
 import UserList from './components/user-list';
 import TodoList from './components/todo-list';
 

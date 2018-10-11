@@ -1,9 +1,4 @@
-import type { BasketStore, BasketActions } from './types';
-
-export default function bindActions(
-  actions,
-  store: BasketStore<any>
-): BasketActions<any> {
+export default function bindActions(actions, store) {
   return Object.keys(actions).reduce((acc, k) => {
     // Using a custom produce so we can name fn for better debuggability
     const namedProduce = fn => {

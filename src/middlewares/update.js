@@ -1,8 +1,4 @@
-// @flow
-
-import type { Middleware } from '../types';
-
-const updateMiddleware: Middleware = store => next => fn => {
+const updateMiddleware = store => next => fn => {
   const changes = [];
   const state = store.getState();
   const nextState = next(state, fn, patches => {

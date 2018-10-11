@@ -1,16 +1,15 @@
 // @flow
 import React, { Component } from 'react';
+import { Yield } from 'react-adone';
 
-import { Yield } from '../../../src';
+import userBasket from '../baskets/user';
 
-import * as usersBasket from '../baskets/users';
-
-type User = { id: number, name: string };
+type User = { id: string, name: string };
 
 type UserItemProps = {
   user: User,
   isSelected: boolean,
-  onClick: () => void,
+  onClick: () => any,
 };
 
 const UserItem = ({ user, isSelected, onClick }: UserItemProps) => (
@@ -25,9 +24,9 @@ const UserItem = ({ user, isSelected, onClick }: UserItemProps) => (
 type UserListProps = {
   users: User[],
   loading: boolean,
-  selected: number,
-  onLoad: () => void,
-  onSelect: (id: number) => void,
+  selected: string | null,
+  onLoad: () => any,
+  onSelect: (id: string) => any,
 };
 
 class UserList extends Component<UserListProps> {
@@ -53,8 +52,8 @@ class UserList extends Component<UserListProps> {
 }
 
 const YieldedUserList = () => (
-  <Yield from={usersBasket}>
-    {({ data, loading, selected, load, select }) => {
+  <Yield from={userBasket}>
+    {({ data, loading, selected, select, load }) => {
       return (
         <UserList
           users={data || []}

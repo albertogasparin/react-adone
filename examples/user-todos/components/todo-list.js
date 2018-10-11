@@ -1,10 +1,9 @@
 // @flow
 import React, { Component } from 'react';
+import { Yield } from 'react-adone';
 
-import { Yield } from '../../../src';
-
-import * as usersBasket from '../baskets/users';
-import * as todosBasket from '../baskets/todos';
+import userBasket from '../baskets/user';
+import todoBasket from '../baskets/todo';
 
 type Todo = { title: string };
 
@@ -17,16 +16,16 @@ const TodoItem = ({ todo }: TodoItemProps) => (
 );
 
 type TodoListProps = {
-  selectedUser: number,
+  selectedUser: ?string,
   todos: Todo[],
   loading: boolean,
-  onLoad: (uid: number) => void,
+  onLoad: (uid: string) => any,
 };
 
 class TodoList extends Component<TodoListProps> {
   componentDidUpdate(prevProps) {
     const { selectedUser, onLoad } = this.props;
-    if (selectedUser !== prevProps.selectedUser) {
+    if (selectedUser && selectedUser !== prevProps.selectedUser) {
       onLoad(selectedUser);
     }
   }
@@ -52,9 +51,9 @@ class TodoList extends Component<TodoListProps> {
 }
 
 const YieldedTodoList = () => (
-  <Yield from={usersBasket} pick={usersBasket.selectors.selected}>
+  <Yield from={userBasket} pick={userBasket.selectors.getSelected}>
     {({ selected }) => (
-      <Yield from={todosBasket}>
+      <Yield from={todoBasket}>
         {({ data, loading, load }) => (
           <TodoList
             todos={data || []}

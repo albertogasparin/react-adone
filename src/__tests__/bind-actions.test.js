@@ -1,4 +1,3 @@
-// @flow
 /* eslint-env jest */
 
 import { basketMock, storeMock } from './mocks';
@@ -20,7 +19,6 @@ describe('bindActions', () => {
     const action2 = jest.fn();
     const produce = jest.fn();
     basketMock.actions.increase.mockReturnValue(action2);
-    // $FlowFixMe
     combineMiddlewares.mockReturnValue(produce);
     const result = bindActions(basketMock.actions, storeMock, []);
     result.increase(1);

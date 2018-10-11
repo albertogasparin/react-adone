@@ -1,22 +1,10 @@
-// @flow
-
 import React, { Component } from 'react';
 
 import shallowEqual from './utils/shallow-equal';
 import createStore from './create-store';
 import bindActions from './bind-actions';
 
-import type {
-  BasketStoreUnsubscribe,
-  Middleware,
-  YieldBasket,
-  YieldProviderProps,
-  YieldProviderState,
-  YieldProps,
-  YieldState,
-} from './types';
-
-export const fallbackProviderState: YieldProviderState = {
+export const fallbackProviderState = {
   baskets: {},
   middlewares: [],
   addBasket(key, basket) {
@@ -26,13 +14,15 @@ export const fallbackProviderState: YieldProviderState = {
 
 const { Provider, Consumer } = React.createContext(fallbackProviderState);
 
+export class Yield extends Component {
 export class Yield extends Component<YieldProps, ?YieldState> {
+
   static defaultProps = {
-    pick: (state: *) => state,
+    pick: state => state,
   };
 
-  basket: ?YieldBasket<{}> = null;
-  unsubscribeStore: ?BasketStoreUnsubscribe = null;
+  basket = null;
+  unsubscribeStore = null;
   state = null;
 
   componentDidMount() {
@@ -53,7 +43,7 @@ export class Yield extends Component<YieldProps, ?YieldState> {
     return pick && this.basket ? pick(this.basket.store.getState()) : {};
   }
 
-  onUpdate = (isMount: boolean = false) => {
+  onUpdate = (isMount = false) => {
     if (!this.basket) return;
     const prevState = this.state;
     const nextState = this.getBasketState();
@@ -63,14 +53,14 @@ export class Yield extends Component<YieldProps, ?YieldState> {
     }
   };
 
-  createBasket(middlewares: Middleware[]): YieldBasket<*> {
+  createBasket(middlewares) {
     const { from } = this.props;
     const store = createStore(from.key, from.defaultState, middlewares);
     const actions = bindActions(from.actions, store);
     return { store, actions };
   }
 
-  setBasket(basket: YieldBasket<*>) {
+  setBasket(basket) {
     this.basket = basket;
     this.unsubscribeStore = this.basket.store.subscribe(this.onUpdate);
   }
@@ -104,16 +94,18 @@ export class Yield extends Component<YieldProps, ?YieldState> {
   }
 }
 
+export class YieldProvider extends Component {
 export class YieldProvider extends Component<
   YieldProviderProps,
   YieldProviderState
 > {
+
   static defaultProps = {
     baskets: {},
     middlewares: [],
   };
 
-  constructor(props: YieldProviderProps) {
+  constructor(props) {
     super(props);
     this.state = {
       baskets: this.props.baskets,
@@ -122,7 +114,7 @@ export class YieldProvider extends Component<
     };
   }
 
-  addBasket = (key: string, value: YieldBasket<*>) => {
+  addBasket = (key, value) => {
     // change state directly so we don't trigger a re-render
     // plus it's used by newly created consumers that will have
     // the basket internally anyway

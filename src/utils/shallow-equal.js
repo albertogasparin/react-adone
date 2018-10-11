@@ -1,11 +1,9 @@
-// @flow
-
 // Mostly copied from fbjs/packages/fbjs/src/core/shallowEqual.js
 // inlined because fbjs/shallowEqual might get removed from React
 
 const hasOwnProperty = Object.prototype.hasOwnProperty;
 
-export default function shallowEqual(objA: mixed, objB: mixed): boolean {
+export default function shallowEqual(objA, objB) {
   if (objA === objB) {
     return true;
   }

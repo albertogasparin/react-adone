@@ -1,7 +1,4 @@
-// @flow
-import type { BasketStore } from '../types';
-
-const withDevtools = (createStore: any) => (...args: any): BasketStore<any> => {
+const withDevtools = createStore => (...args) => {
   const store = createStore(...args);
 
   if (window && window.__REDUX_DEVTOOLS_EXTENSION__) {

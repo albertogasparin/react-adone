@@ -1,9 +1,6 @@
-// @flow
 /* eslint-env jest */
 
-import type { Basket, BasketStore } from '../types';
-
-export const basketMock: Basket<{}> = {
+export const basketMock = {
   key: 'basket.key',
   defaultState: { count: 0 },
   actions: {
@@ -12,7 +9,7 @@ export const basketMock: Basket<{}> = {
   },
 };
 
-export const storeMock: BasketStore<{}> = {
+export const storeMock = {
   key: basketMock.key,
   getState: jest.fn(),
   setState: jest.fn(),
