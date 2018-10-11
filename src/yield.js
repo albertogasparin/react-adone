@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 
 import shallowEqual from './utils/shallow-equal';
 import createStore from './create-store';
@@ -15,7 +16,15 @@ export const fallbackProviderState = {
 const { Provider, Consumer } = React.createContext(fallbackProviderState);
 
 export class Yield extends Component {
-export class Yield extends Component<YieldProps, ?YieldState> {
+  static propTypes = {
+    children: PropTypes.func.isRequired,
+    from: PropTypes.shape({
+      key: PropTypes.string.isRequired,
+      defaultState: PropTypes.object.isRequired,
+      actions: PropTypes.object.isRequired,
+    }).isRequired,
+    pick: PropTypes.func,
+  };
 
   static defaultProps = {
     pick: state => state,
@@ -95,10 +104,11 @@ export class Yield extends Component<YieldProps, ?YieldState> {
 }
 
 export class YieldProvider extends Component {
-export class YieldProvider extends Component<
-  YieldProviderProps,
-  YieldProviderState
-> {
+  static propTypes = {
+    children: PropTypes.node,
+    baskets: PropTypes.object,
+    middlewares: PropTypes.arrayOf(PropTypes.func),
+  };
 
   static defaultProps = {
     baskets: {},
