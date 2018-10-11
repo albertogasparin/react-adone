@@ -1,0 +1,43 @@
+// @flow
+
+import { type Node, Component } from 'react';
+
+type Produce<ST> = (modifier: (ST) => ST | void) => void;
+type BasketStoreUnsubscribe = () => void;
+
+export type BasketAction<ST> = (produce: Produce<ST>, getState: () => ST) => *;
+
+type YieldRenderPropFunction<ST, AC> = ({
+  ...$Exact<ST>,
+  ...$Exact<AC>,
+}) => Node;
+
+export type Basket<ST, AC> = {
+  key: string,
+  defaultState: ST,
+  actions: AC,
+  selectors?: {},
+};
+
+export type BasketStore<ST> = {|
+  getState: () => ST,
+  setState: ST => void,
+  key: string,
+  subscribe: (listener: () => void) => BasketStoreUnsubscribe,
+  produce: Produce<ST>,
+|};
+
+export class Yield<ST, AC, PI = ST> extends Component<{
+  from: Basket<ST, AC>,
+  children: YieldRenderPropFunction<ST, AC>,
+  pick?: ST => PI,
+}> {
+  basket: {
+    store: BasketStore<ST>,
+    actions: AC,
+  };
+}
+
+export class YieldProvider extends Component<{}> {}
+
+export type fallbackProviderState = any;
