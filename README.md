@@ -23,13 +23,11 @@ Similar to Redux, actions receive a `produce` function (read dispatcher) that ge
 
 ```js
 // baskets/counter.js
-export const key = 'counter';
-
-export const defaultState = {
+const defaultState = {
   count: 0,
 };
 
-export const actions = {
+const actions = {
   increment: () => produce => {
     // produce() calls immer after passing through middlewares
     // the mutation function should return undefined or the entire new state
@@ -38,12 +36,14 @@ export const actions = {
     });
   },
 };
+
+export default { key: 'counter', defaultState, actions };
 ```
 
 ```js
 // app.js
 import { YieldProvider, Yield } from 'react-adone';
-import * as counterBasket from './baskets/counter';
+import counterBasket from './baskets/counter';
 
 const App = () => (
   <YieldProvider>
@@ -65,7 +65,7 @@ If you have [Redux Devtools extension](https://github.com/zalmoxisus/redux-devto
 If you use arrow functions as mutators, the devtools will show just the action name, but if you use named functions you will get also the mutator's name (really handy when an action produces multiple mutations):
 
 ```js
-export const actions = {
+const actions = {
   increment: () => produce => {
     // this will be logged as "increment"
     produce(draft => {
@@ -79,20 +79,24 @@ export const actions = {
 };
 ```
 
+## Running examples
+
+I provided few examples to see Adone in action. Run `npm run start` and then go and check each folder:
+
+- Advanced async example with Flow typing `http://localhost:8080/advanced-flow/`
+
 ## Advanced usage
 
 #### Basket async actions
 
 ```js
-// baskets/todos.js
-export const key = 'todos';
-
-export const defaultState = {
+// baskets/todo.js
+const defaultState = {
   data: null,
   loading: false,
 };
 
-export const actions = {
+const actions = {
   // the mutator function cannot be async
   // but the thunk returned by the action sure can
   load: () => async (produce, getState) => {
@@ -108,6 +112,8 @@ export const actions = {
     });
   },
 };
+
+export default { key: 'todo', defaultState, actions };
 ```
 
 Look at `./examples` folder for more.
@@ -119,7 +125,7 @@ Adone supports Redux-like middlewares. They can be added as props to `YieldProvi
 ```js
 // app.js
 import { YieldProvider, Yield } from 'react-adone';
-import * as counterBasket from './baskets/counter';
+import counterBasket from './baskets/counter';
 
 const logger = store => next => fn => {
   console.log("Updating", store.key);
@@ -155,10 +161,10 @@ export const selectors = {
 ```js
 // todos-count.js
 import { Yield } from 'react-adone';
-import * as todoBasket from './baskets/todo';
+import todoBasket, { selectors } from './baskets/todo';
 
 export const TodosCount = () => (
-  <Yield from={todoBasket} pick={todosBasket.selectors.getTodosCount}>
+  <Yield from={todoBasket} pick={selectors.getTodosCount}>
     {/* render prop is called only on todosCount change */}
     {({ todosCount }) => <p>You have {todosCount} todos</p>}
   </Yield>
@@ -171,13 +177,34 @@ A useful value of `pick` is `null`: when so, `Yield` children will not re-render
 ```js
 // button-increment.js
 import { Yield } from 'react-adone';
-import * as counterBasket from './baskets/counter';
+import counterBasket from './baskets/counter';
 
 export const ButtonIncrement = () => (
   <Yield from={counterBasket} pick={null}>
     {({ actions }) => <button onClick={actions.increment}>+</button>}
   </Yield>
 );
+```
+
+#### Named components
+
+Adone exports an helper function to create yielded components from a specific basket
+so you don't have to specify a basket and a pick function
+
+```js
+// todo-components.js
+import { createYield } from 'react-adone';
+import todoBasket, { selectors } from './baskets/todo';
+
+export const TodoYield = createYield('TodoYield', todoBasket);
+export const TodosCountYield = createYield(
+  'TodosCountYield',
+  todoBasket,
+  selectors.getTodosCount
+);
+// and they can be used as:
+// <TodoYield>{({ ... }) => ... }<TodoYield>
+// <TodosCountYield>{({ ... }) => ... }<TodosCountYield>
 ```
 
 #### Composition

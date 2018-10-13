@@ -1,22 +1,29 @@
 // @flow
+/* eslint-disable no-redeclare */
 
-import { type Node, Component } from 'react';
+import type { Node } from 'react';
+
+/**
+ * ST: Full basket state
+ * PI: Picked basket state (or result)
+ * AC: Basket actions
+ */
 
 type Produce<ST> = (modifier: (ST) => ST | void) => void;
 type BasketStoreUnsubscribe = () => void;
+type Middleware = (store: BasketStore<any>) => (next: *) => (fn: *) => *;
 
 export type BasketAction<ST> = (produce: Produce<ST>, getState: () => ST) => *;
 
-type YieldRenderPropFunction<ST, AC> = ({
-  ...$Exact<ST>,
-  ...$Exact<AC>,
+type YieldRenderPropFunction<S, A> = ({
+  ...$Exact<S>,
+  ...$Exact<A>,
 }) => Node;
 
 export type Basket<ST, AC> = {
   key: string,
   defaultState: ST,
   actions: AC,
-  selectors?: {},
 };
 
 export type BasketStore<ST> = {|
@@ -27,17 +34,46 @@ export type BasketStore<ST> = {|
   produce: Produce<ST>,
 |};
 
-export class Yield<ST, AC, PI = ST> extends Component<{
-  from: Basket<ST, AC>,
-  children: YieldRenderPropFunction<ST, AC>,
-  pick?: ST => PI,
-}> {
+declare export class Yield<ST, AC, PI> extends React$Component<
+  | {
+      from: Basket<ST, AC>,
+      children: YieldRenderPropFunction<ST, AC>,
+    }
+  | {
+      from: Basket<ST, AC>,
+      children: YieldRenderPropFunction<PI, AC>,
+      pick: ST => PI,
+    }
+> {
   basket: {
     store: BasketStore<ST>,
     actions: AC,
   };
 }
 
-export class YieldProvider extends Component<{}> {}
-
 export type fallbackProviderState = any;
+
+declare export class YieldProvider extends React$Component<{
+  middlewares?: Middleware[],
+  baskets?: { [key: string]: any },
+}> {}
+
+declare export function createYield<ST, AC, PI>(
+  from: Basket<ST, AC>
+): React$ComponentType<{ children: YieldRenderPropFunction<ST, AC> }>;
+
+declare export function createYield<ST, AC>(
+  name: string,
+  from: Basket<ST, AC>
+): React$ComponentType<{ children: YieldRenderPropFunction<ST, AC> }>;
+
+declare export function createYield<ST, AC, PI>(
+  from: Basket<ST, AC>,
+  pick: (ST) => PI
+): React$ComponentType<{ children: YieldRenderPropFunction<PI, AC> }>;
+
+declare export function createYield<ST, AC, PI>(
+  name: string,
+  from: Basket<ST, AC>,
+  pick: (ST) => PI
+): React$ComponentType<{ children: YieldRenderPropFunction<PI, AC> }>;
