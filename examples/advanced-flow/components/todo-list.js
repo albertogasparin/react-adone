@@ -1,14 +1,12 @@
 // @flow
 import React, { Component } from 'react';
-import { Yield } from 'react-adone';
 
-import userBasket from '../baskets/user';
-import todoBasket from '../baskets/todo';
-
-type Todo = { title: string };
+import { UserSelectedState } from '../baskets/user';
+import { TodoState } from '../baskets/todo';
+import { type TodoModel } from '../baskets/todo/types';
 
 type TodoItemProps = {
-  todo: Todo,
+  todo: TodoModel,
 };
 
 const TodoItem = ({ todo }: TodoItemProps) => (
@@ -17,7 +15,7 @@ const TodoItem = ({ todo }: TodoItemProps) => (
 
 type TodoListProps = {
   selectedUser: ?string,
-  todos: Todo[],
+  todos: TodoModel[],
   loading: boolean,
   onLoad: (uid: string) => any,
 };
@@ -51,20 +49,20 @@ class TodoList extends Component<TodoListProps> {
 }
 
 const YieldedTodoList = () => (
-  <Yield from={userBasket} pick={userBasket.selectors.getSelected}>
-    {({ selected }) => (
-      <Yield from={todoBasket}>
+  <UserSelectedState>
+    {({ sel }) => (
+      <TodoState>
         {({ data, loading, load }) => (
           <TodoList
             todos={data || []}
             loading={loading}
             onLoad={load}
-            selectedUser={selected}
+            selectedUser={sel}
           />
         )}
-      </Yield>
+      </TodoState>
     )}
-  </Yield>
+  </UserSelectedState>
 );
 
 export default YieldedTodoList;
