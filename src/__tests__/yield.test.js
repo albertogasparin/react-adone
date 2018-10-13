@@ -158,7 +158,6 @@ describe('YieldProvider', () => {
         value: {
           addBasket: expect.any(Function),
           baskets: {},
-          middlewares: [],
         },
       });
     });

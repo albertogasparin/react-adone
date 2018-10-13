@@ -11,9 +11,6 @@ import type { Node } from 'react';
 
 type Produce<ST> = (modifier: (ST) => ST | void) => void;
 type BasketStoreUnsubscribe = () => void;
-type Middleware = (store: BasketStore<any>) => (next: *) => (fn: *) => *;
-
-export type BasketAction<ST> = (produce: Produce<ST>, getState: () => ST) => *;
 
 type YieldRenderPropFunction<S, A> = ({
   ...$Exact<S>,
@@ -34,6 +31,8 @@ export type BasketStore<ST> = {|
   produce: Produce<ST>,
 |};
 
+export type BasketAction<ST> = (produce: Produce<ST>, getState: () => ST) => *;
+
 declare export class Yield<ST, AC, PI> extends React$Component<
   | {
       from: Basket<ST, AC>,
@@ -51,12 +50,23 @@ declare export class Yield<ST, AC, PI> extends React$Component<
   };
 }
 
-export type fallbackProviderState = any;
-
 declare export class YieldProvider extends React$Component<{
-  middlewares?: Middleware[],
   baskets?: { [key: string]: any },
 }> {}
+
+type MiddlewareResult = { changes: any[] };
+export type Middleware = (
+  store: BasketStore<any>
+) => (next: (fn: any) => MiddlewareResult) => (fn: () => *) => MiddlewareResult;
+
+declare export var defaults: {
+  devtools: boolean,
+  middlewares: Set<Middleware>,
+};
+
+export type fallbackProviderState = {
+  baskets: { [key: string]: any },
+};
 
 declare export function createYield<ST, AC, PI>(
   from: Basket<ST, AC>

@@ -13,7 +13,7 @@ const defaultState: State = {
 };
 
 const basket = {
-  key: 'users',
+  key: 'user',
   defaultState,
   actions,
 };

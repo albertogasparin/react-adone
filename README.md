@@ -61,24 +61,6 @@ const App = () => (
 );
 ```
 
-If you have [Redux Devtools extension](https://github.com/zalmoxisus/redux-devtools-extension) installed, Adone action's mutators and state will be visible there.
-If you use arrow functions as mutators, the devtools will show just the action name, but if you use named functions you will get also the mutator's name (really handy when an action produces multiple mutations):
-
-```js
-const actions = {
-  increment: () => produce => {
-    // this will be logged as "increment"
-    produce(draft => {
-      draft.count += 1;
-    });
-    // this will be logged as "increment.addOne"
-    produce(function addOne(draft) {
-      draft.count += 1;
-    });
-  },
-};
-```
-
 ## Running examples
 
 I provided few examples to see Adone in action. Run `npm run start` and then go and check each folder:
@@ -120,28 +102,46 @@ Look at `./examples` folder for more.
 
 #### Middlewares
 
-Adone supports Redux-like middlewares. They can be added as props to `YieldProvider`.
+Adone supports Redux-like middlewares. They can be added via `defaults.middlewares`.
 
 ```js
-// app.js
-import { YieldProvider, Yield } from 'react-adone';
-import counterBasket from './baskets/counter';
+import { defaults } from 'react-adone';
 
 const logger = store => next => fn => {
-  console.log("Updating", store.key);
+  console.log('Updating', store.key);
   const result = next(fn);
-  console.log("Changed", result.changes);
+  console.log('Changed', result.changes);
   return result;
 };
 
-const App = () => (
-  <YieldProvider middlewares={[logger]}>
-    <h1>App</h1>
-    <Yield from={counterBasket}>
-      {({ count, increment }) => (/**/)}
-    </Yield>
-  </YieldProvider>
-)
+defaults.middlewares.add(logger);
+```
+
+#### Devtools
+
+If you have [Redux Devtools extension](https://github.com/zalmoxisus/redux-devtools-extension) installed, Adone action's mutators and state will be visible there.
+If you use arrow functions as mutators, the devtools will show just the action name, but if you use named functions you will get also the mutator's name (really handy when an action produces multiple mutations):
+
+```js
+const actions = {
+  increment: () => produce => {
+    // this will be logged as "increment"
+    produce(draft => {
+      draft.count += 1;
+    });
+    // this will be logged as "increment.addOne"
+    produce(function addOne(draft) {
+      draft.count += 1;
+    });
+  },
+};
+```
+
+If you want to turn devtools off (for instance on prod), just set the `defaults.devtools` to `false`:
+
+```js
+import { defaults } from 'react-adone';
+defaults.devtools = false;
 ```
 
 ## Optimisations

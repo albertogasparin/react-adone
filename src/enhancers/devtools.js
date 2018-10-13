@@ -1,7 +1,9 @@
+import defaults from '../defaults';
+
 const withDevtools = createStore => (...args) => {
   const store = createStore(...args);
 
-  if (window && window.__REDUX_DEVTOOLS_EXTENSION__) {
+  if (defaults.devtools && window && window.__REDUX_DEVTOOLS_EXTENSION__) {
     const origProduce = store.produce;
     const devTools = window.__REDUX_DEVTOOLS_EXTENSION__.connect({
       name: `Basket: ${store.key}`,

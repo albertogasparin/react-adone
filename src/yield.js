@@ -7,7 +7,6 @@ import bindActions from './bind-actions';
 
 export const fallbackProviderState = {
   baskets: {},
-  middlewares: [],
   addBasket(key, basket) {
     fallbackProviderState.baskets[key] = basket;
   },
@@ -59,9 +58,9 @@ export class Yield extends Component {
     }
   };
 
-  createBasket(middlewares) {
+  createBasket() {
     const { from } = this.props;
-    const store = createStore(from.key, from.defaultState, middlewares);
+    const store = createStore(from.key, from.defaultState);
     const actions = bindActions(from.actions, store);
     return { store, actions };
   }
@@ -80,10 +79,10 @@ export class Yield extends Component {
       // because context API doesn't have builtin selectors (yet)
       return (
         <Consumer>
-          {({ baskets, middlewares, addBasket }) => {
+          {({ baskets, addBasket }) => {
             let providerBasket = baskets[from.key];
             if (!providerBasket) {
-              providerBasket = this.createBasket(middlewares);
+              providerBasket = this.createBasket();
               addBasket(from.key, providerBasket);
             }
             this.setBasket(providerBasket);
@@ -104,19 +103,16 @@ export class YieldProvider extends Component {
   static propTypes = {
     children: PropTypes.node,
     baskets: PropTypes.object,
-    middlewares: PropTypes.arrayOf(PropTypes.func),
   };
 
   static defaultProps = {
     baskets: {},
-    middlewares: [],
   };
 
   constructor(props) {
     super(props);
     this.state = {
       baskets: this.props.baskets,
-      middlewares: this.props.middlewares,
       addBasket: this.addBasket,
     };
   }
