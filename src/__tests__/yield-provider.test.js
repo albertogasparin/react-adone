@@ -33,7 +33,18 @@ describe('YieldProvider', () => {
         <YieldProvider>{children}</YieldProvider>
       ).instance();
       instance.initBasket(basketMock);
-      expect(initBasket).toHaveBeenCalledWith(basketMock);
+      expect(initBasket).toHaveBeenCalledWith(basketMock, undefined);
+      expect(instance.state.baskets).toHaveProperty(basketMock.key);
+    });
+
+    it('should add basket to state with initial state', () => {
+      const children = <div />;
+      const initialStates = { 'basket-key': { count: 1 } };
+      const instance = shallow(
+        <YieldProvider initialStates={initialStates}>{children}</YieldProvider>
+      ).instance();
+      instance.initBasket(basketMock);
+      expect(initBasket).toHaveBeenCalledWith(basketMock, { count: 1 });
       expect(instance.state.baskets).toHaveProperty(basketMock.key);
     });
   });
