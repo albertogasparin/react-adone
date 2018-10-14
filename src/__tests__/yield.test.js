@@ -4,20 +4,24 @@ import React, { Component } from 'react';
 import { shallow, mount } from 'enzyme';
 
 import { basketMock, storeMock } from './mocks';
-import { Yield, YieldProvider, fallbackProviderState } from '../yield';
+import Yield from '../yield';
+import YieldProvider from '../yield-provider';
+import { fallbackProviderState } from '../context';
 import createStore from '../create-store';
 
 jest.mock('../create-store');
 
 describe('Yield', () => {
   const fbProviderState = { ...fallbackProviderState };
-  const addBasket = jest.fn();
+  const initBasket = jest
+    .fn()
+    .mockReturnValue({ store: storeMock, actions: basketMock.actions });
   const children = jest.fn().mockReturnValue(null);
 
   const modes = {
     withProvider: (baskets = {}) => {
       class YieldProviderMock extends YieldProvider {
-        state = { baskets, middlewares: [], addBasket };
+        state = { baskets, initBasket };
       }
       const getElement = () => (
         <YieldProviderMock>
@@ -29,15 +33,29 @@ describe('Yield', () => {
           .childAt(0)
           .shallow();
       const getMount = () => mount(getElement()).childAt(0);
-      return { getElement, getShallow, getMount, addBasket, baskets, children };
+      return {
+        getElement,
+        getShallow,
+        getMount,
+        initBasket,
+        baskets,
+        children,
+      };
     },
     withoutProvider: (baskets = {}) => {
       fallbackProviderState.baskets = baskets;
-      fallbackProviderState.addBasket = addBasket;
+      fallbackProviderState.initBasket = initBasket;
       const getElement = () => <Yield from={basketMock}>{children}</Yield>;
       const getShallow = () => shallow(getElement());
       const getMount = () => mount(getElement());
-      return { getElement, getShallow, getMount, addBasket, baskets, children };
+      return {
+        getElement,
+        getShallow,
+        getMount,
+        initBasket,
+        baskets,
+        children,
+      };
     },
   };
 
@@ -62,20 +80,17 @@ describe('Yield', () => {
       });
 
       it('should create a basket if first time', () => {
-        const { getMount, addBasket } = setup();
+        const { getMount, initBasket } = setup();
         getMount();
-        expect(addBasket).toHaveBeenCalledWith(basketMock.key, {
-          store: expect.any(Object),
-          actions: expect.any(Object),
-        });
+        expect(initBasket).toHaveBeenCalledWith(basketMock);
       });
 
       it('should get the basket instance if any', () => {
-        const { getMount, addBasket } = setup({
+        const { getMount, initBasket } = setup({
           [basketMock.key]: { store: storeMock, actions: {} },
         });
         getMount();
-        expect(addBasket).not.toHaveBeenCalled();
+        expect(initBasket).not.toHaveBeenCalled();
       });
 
       it('should save basket instance locally and listen', () => {
@@ -142,37 +157,6 @@ describe('Yield', () => {
         expect(instance.unsubscribeStore).toEqual(unsubscribeMock);
         instance.componentWillUnmount();
         expect(unsubscribeMock).toHaveBeenCalled();
-      });
-    });
-  });
-});
-
-describe('YieldProvider', () => {
-  describe('render', () => {
-    it('should render context provider with value prop and children', () => {
-      const children = <div />;
-      const wrapper = shallow(<YieldProvider>{children}</YieldProvider>);
-      expect(wrapper.name()).toEqual('ContextProvider');
-      expect(wrapper.props()).toEqual({
-        children,
-        value: {
-          addBasket: expect.any(Function),
-          baskets: {},
-        },
-      });
-    });
-  });
-
-  describe('addBasket', () => {
-    it('should add basket to state', () => {
-      const children = <div />;
-      const yieldBasket = { store: storeMock, actions: {} };
-      const instance = shallow(
-        <YieldProvider>{children}</YieldProvider>
-      ).instance();
-      instance.addBasket(basketMock.key, yieldBasket);
-      expect(instance.state.baskets).toEqual({
-        [basketMock.key]: yieldBasket,
       });
     });
   });

@@ -2,7 +2,7 @@ import applyMiddleware from './middlewares';
 import withDevtools from './enhancers/devtools';
 import defaults from './defaults';
 
-const createStore = (key, initialState) => {
+function createStore(key, initialState) {
   let listeners = [];
   let currentState = initialState;
   const store = {
@@ -23,6 +23,6 @@ const createStore = (key, initialState) => {
   };
   store.produce = applyMiddleware(store, defaults.middlewares);
   return store;
-};
+}
 
 export default withDevtools(createStore);

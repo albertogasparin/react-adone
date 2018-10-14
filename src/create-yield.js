@@ -1,4 +1,4 @@
-import { Yield } from './yield';
+import Yield from './yield';
 
 export default function createYield(name, from, pick) {
   if (typeof name !== 'string') {

@@ -1,20 +1,12 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
-import shallowEqual from './utils/shallow-equal';
-import createStore from './create-store';
 import bindActions from './bind-actions';
+import { Consumer } from './context';
+import createStore from './create-store';
+import shallowEqual from './utils/shallow-equal';
 
-export const fallbackProviderState = {
-  baskets: {},
-  addBasket(key, basket) {
-    fallbackProviderState.baskets[key] = basket;
-  },
-};
-
-const { Provider, Consumer } = React.createContext(fallbackProviderState);
-
-export class Yield extends Component {
+export default class Yield extends Component {
   static propTypes = {
     children: PropTypes.func.isRequired,
     from: PropTypes.shape({
@@ -79,12 +71,8 @@ export class Yield extends Component {
       // because context API doesn't have builtin selectors (yet)
       return (
         <Consumer>
-          {({ baskets, addBasket }) => {
-            let providerBasket = baskets[from.key];
-            if (!providerBasket) {
-              providerBasket = this.createBasket();
-              addBasket(from.key, providerBasket);
-            }
+          {({ baskets, initBasket }) => {
+            let providerBasket = baskets[from.key] || initBasket(from);
             this.setBasket(providerBasket);
             return null;
           }}
@@ -96,36 +84,5 @@ export class Yield extends Component {
     // we already serve the updated state and skip an additional render
     this.state = this.getBasketState();
     return children({ ...this.state, ...basket.actions });
-  }
-}
-
-export class YieldProvider extends Component {
-  static propTypes = {
-    children: PropTypes.node,
-    baskets: PropTypes.object,
-  };
-
-  static defaultProps = {
-    baskets: {},
-  };
-
-  constructor(props) {
-    super(props);
-    this.state = {
-      baskets: this.props.baskets,
-      addBasket: this.addBasket,
-    };
-  }
-
-  addBasket = (key, value) => {
-    // change state directly so we don't trigger a re-render
-    // plus it's used by newly created consumers that will have
-    // the basket internally anyway
-    this.state.baskets[key] = value;
-  };
-
-  render() {
-    const { children } = this.props;
-    return <Provider value={this.state}>{children}</Provider>;
   }
 }
