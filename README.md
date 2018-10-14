@@ -1,5 +1,11 @@
 # React Adone
 
+[![npm](https://img.shields.io/npm/v/react-adone.svg?maxAge=2592000)](https://www.npmjs.com/package/react-adone)
+[![License](https://img.shields.io/:license-mit-blue.svg)](http://albertogasparin.mit-license.org)
+[![CircleCI](https://circleci.com/gh/albertogasparin/react-adone.svg?style=shield&circle-token=17a5f372d198e27098226779bc1afd8fd6a2fb3a)](https://circleci.com/gh/albertogasparin/react-adone)
+[![Dependency Status](https://david-dm.org/albertogasparin/react-adone.svg)](https://david-dm.org/albertogasparin/react-adone)
+[![devDependency Status](https://david-dm.org/albertogasparin/react-adone/dev-status.svg)](https://david-dm.org/albertogasparin/react-adone#info=devDependencies)
+
 Yes, this is another Redux-like/Context-alternative solution. Probably you better off using more well known libs unless:
 
 - You don't want to create hundreds of Contexts to share pieces of state
@@ -253,3 +259,8 @@ const UserProject = () => (
   </Composer>
 );
 ```
+
+## Contributing
+
+To test your changes you can run the examples (with `npm run start`).
+Also, make sure you run `npm run preversion` before creating you PR so you will double check that linting, types and tests are fine.
