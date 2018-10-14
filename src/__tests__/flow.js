@@ -81,12 +81,24 @@ Test = (
   <Yield from={basket}>{({ increment }) => increment()}</Yield>
 );
 
+Test = (
+  // $ExpectError Child arg shape should be just actions
+  <Yield from={basket} pick={null}>
+    {({ count }) => count}
+  </Yield>
+);
+
 // Correct
 Test = <Yield from={basket}>{({ count }) => count + 0}</Yield>;
 Test = <Yield from={basket}>{({ increment }) => increment(1)}</Yield>;
 Test = (
   <Yield from={basket} pick={() => ({ baz: 1 })}>
     {({ baz }) => baz}
+  </Yield>
+);
+Test = (
+  <Yield from={basket} pick={null}>
+    {({ increment }) => increment(1)}
   </Yield>
 );
 
@@ -118,6 +130,16 @@ Test = (
 
 // Correct
 Test = <TypeYield>{({ baz }) => baz}</TypeYield>;
+Test = <TypeYield>{({ increment }) => increment(1)}</TypeYield>;
+
+TypeYield = createYield(basket, null);
+
+Test = (
+  // $ExpectError Child arg shape should be just actions
+  <TypeYield>{({ count }) => count}</TypeYield>
+);
+
+// Correct
 Test = <TypeYield>{({ increment }) => increment(1)}</TypeYield>;
 
 /**

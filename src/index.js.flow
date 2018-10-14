@@ -52,6 +52,11 @@ declare export class Yield<ST, AC, PI> extends React$Component<
       children: YieldRenderPropFunction<PI, AC>,
       pick: ST => PI,
     |}
+  | {|
+      from: Basket<ST, AC>,
+      children: YieldRenderPropFunction<{||}, AC>,
+      pick: null,
+    |}
 > {
   basket: basketInstance<ST, AC>;
 }
@@ -95,7 +100,18 @@ declare export function createYield<ST, AC, PI>(
 ): React$ComponentType<{ children: YieldRenderPropFunction<PI, AC> }>;
 
 declare export function createYield<ST, AC, PI>(
+  from: Basket<ST, AC>,
+  pick: null
+): React$ComponentType<{ children: YieldRenderPropFunction<{||}, AC> }>;
+
+declare export function createYield<ST, AC, PI>(
   name: string,
   from: Basket<ST, AC>,
   pick: (ST) => PI
 ): React$ComponentType<{ children: YieldRenderPropFunction<PI, AC> }>;
+
+declare export function createYield<ST, AC, PI>(
+  name: string,
+  from: Basket<ST, AC>,
+  pick: null
+): React$ComponentType<{ children: YieldRenderPropFunction<{||}, AC> }>;
