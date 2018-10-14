@@ -10,10 +10,11 @@ import type { Node } from 'react';
  */
 
 type Produce<ST> = (modifier: (ST) => ST | void) => void;
+type GetState<ST> = () => $ReadOnly<ST>;
 type BasketStoreUnsubscribe = () => void;
 
 type YieldRenderPropFunction<S, A> = ({
-  ...$Exact<S>,
+  ...$Exact<$ReadOnly<S>>,
   ...$Exact<A>,
 }) => Node;
 
@@ -24,14 +25,17 @@ export type Basket<ST, AC> = {
 };
 
 export type BasketStore<ST> = {|
-  getState: () => ST,
+  getState: GetState<ST>,
   setState: ST => void,
   key: string,
   subscribe: (listener: () => void) => BasketStoreUnsubscribe,
   produce: Produce<ST>,
 |};
 
-export type BasketAction<ST> = (produce: Produce<ST>, getState: () => ST) => *;
+export type BasketAction<ST> = (
+  produce: Produce<ST>,
+  getState: GetState<ST>
+) => *;
 
 export type basketInstance<ST, AC> = {
   store: BasketStore<ST>,
@@ -39,15 +43,15 @@ export type basketInstance<ST, AC> = {
 };
 
 declare export class Yield<ST, AC, PI> extends React$Component<
-  | {
+  | {|
       from: Basket<ST, AC>,
       children: YieldRenderPropFunction<ST, AC>,
-    }
-  | {
+    |}
+  | {|
       from: Basket<ST, AC>,
       children: YieldRenderPropFunction<PI, AC>,
       pick: ST => PI,
-    }
+    |}
 > {
   basket: basketInstance<ST, AC>;
 }
@@ -58,7 +62,7 @@ declare export class YieldProvider extends React$Component<
   },
   {
     baskets: { [key: string]: basketInstance<any, any> },
-    initBasket: (Basket<any, any>) => basketInstance<any, any>,
+    initBasket: <ST, AC>(Basket<ST, AC>) => basketInstance<ST, AC>,
   }
 > {}
 
@@ -76,7 +80,7 @@ export type fallbackProviderState = {
   initialStates: { [key: string]: any },
 };
 
-declare export function createYield<ST, AC, PI>(
+declare export function createYield<ST, AC>(
   from: Basket<ST, AC>
 ): React$ComponentType<{ children: YieldRenderPropFunction<ST, AC> }>;
 

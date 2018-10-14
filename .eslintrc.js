@@ -16,6 +16,11 @@ module.exports = {
     ecmaVersion: 2018,
     sourceType: 'module',
   },
+  settings: {
+    react: {
+      version: 'latest',
+    },
+  },
   plugins: ['react', 'flowtype', 'import'],
   rules: {
     indent: ['off'],
