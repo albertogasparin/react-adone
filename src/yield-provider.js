@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
 import { Provider } from './context';
-import initBasket from './init-basket';
+import BasketRegistry from './registry';
 
 export default class YieldProvider extends Component {
   static propTypes = {
@@ -16,21 +16,12 @@ export default class YieldProvider extends Component {
 
   constructor(props) {
     super(props);
+    this.registry = new BasketRegistry(props.initialStates);
     this.state = {
-      baskets: {},
-      initBasket: this.initBasket,
+      baskets: this.registry.baskets,
+      initBasket: this.registry.initBasket,
     };
   }
-
-  initBasket = basket => {
-    const { initialStates } = this.props;
-    const basketInstance = initBasket(basket, initialStates[basket.key]);
-    // change state directly so we don't trigger a re-render
-    // plus it's used by newly created consumers that will have
-    // the basket internally anyway
-    this.state.baskets[basket.key] = basketInstance;
-    return basketInstance;
-  };
 
   render() {
     const { children } = this.props;

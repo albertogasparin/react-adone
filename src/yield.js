@@ -72,7 +72,7 @@ export default class Yield extends Component {
       return (
         <Consumer>
           {({ baskets, initBasket }) => {
-            let providerBasket = baskets[from.key] || initBasket(from);
+            let providerBasket = baskets.get(from.key) || initBasket(from);
             this.setBasket(providerBasket);
             return null;
           }}

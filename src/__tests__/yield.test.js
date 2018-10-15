@@ -6,27 +6,32 @@ import { shallow, mount } from 'enzyme';
 import { basketMock, storeMock } from './mocks';
 import Yield from '../yield';
 import YieldProvider from '../yield-provider';
-import { fallbackProviderState } from '../context';
-import createStore from '../create-store';
+import { defaultRegistry } from '../registry';
 
-jest.mock('../create-store');
+const mockRegistry = {
+  baskets: new Map(),
+  initBasket: jest
+    .fn()
+    .mockReturnValue({ store: storeMock, actions: basketMock.actions }),
+};
+
+jest.mock('../registry', () => ({
+  __esModule: true,
+  default: jest.fn().mockImplementation(() => mockRegistry),
+  defaultRegistry: {},
+}));
+// looks like cannot set mockRegistry inside .mock()
+Object.assign(defaultRegistry, mockRegistry);
 
 describe('Yield', () => {
-  const fbProviderState = { ...fallbackProviderState };
-  const initBasket = jest
-    .fn()
-    .mockReturnValue({ store: storeMock, actions: basketMock.actions });
   const children = jest.fn().mockReturnValue(null);
 
   const modes = {
-    withProvider: (baskets = {}) => {
-      class YieldProviderMock extends YieldProvider {
-        state = { baskets, initBasket };
-      }
+    withProvider: () => {
       const getElement = () => (
-        <YieldProviderMock>
+        <YieldProvider>
           <Yield from={basketMock}>{children}</Yield>
-        </YieldProviderMock>
+        </YieldProvider>
       );
       const getShallow = () =>
         shallow(getElement())
@@ -37,14 +42,10 @@ describe('Yield', () => {
         getElement,
         getShallow,
         getMount,
-        initBasket,
-        baskets,
         children,
       };
     },
-    withoutProvider: (baskets = {}) => {
-      fallbackProviderState.baskets = baskets;
-      fallbackProviderState.initBasket = initBasket;
+    withoutProvider: () => {
       const getElement = () => <Yield from={basketMock}>{children}</Yield>;
       const getShallow = () => shallow(getElement());
       const getMount = () => mount(getElement());
@@ -52,8 +53,6 @@ describe('Yield', () => {
         getElement,
         getShallow,
         getMount,
-        initBasket,
-        baskets,
         children,
       };
     },
@@ -63,13 +62,11 @@ describe('Yield', () => {
     const setup = modes[key];
     describe(key, () => {
       beforeEach(() => {
-        // $FlowFixMe
-        createStore.mockReturnValue(storeMock);
         storeMock.getState.mockReturnValue(basketMock.defaultState);
       });
 
-      afterAll(() => {
-        Object.assign(fallbackProviderState, fbProviderState);
+      afterEach(() => {
+        mockRegistry.baskets.clear();
       });
 
       it('should render context consumer and not children', () => {
@@ -80,17 +77,19 @@ describe('Yield', () => {
       });
 
       it('should create a basket if first time', () => {
-        const { getMount, initBasket } = setup();
+        const { getMount } = setup();
         getMount();
-        expect(initBasket).toHaveBeenCalledWith(basketMock);
+        expect(mockRegistry.initBasket).toHaveBeenCalledWith(basketMock);
       });
 
       it('should get the basket instance if any', () => {
-        const { getMount, initBasket } = setup({
-          [basketMock.key]: { store: storeMock, actions: {} },
+        mockRegistry.baskets.set(basketMock.key, {
+          store: storeMock,
+          actions: {},
         });
+        const { getMount } = setup();
         getMount();
-        expect(initBasket).not.toHaveBeenCalled();
+        expect(mockRegistry.initBasket).not.toHaveBeenCalled();
       });
 
       it('should save basket instance locally and listen', () => {

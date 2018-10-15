@@ -3,12 +3,7 @@
 import React from 'react';
 import { shallow } from 'enzyme';
 
-import { basketMock } from './mocks';
 import YieldProvider from '../yield-provider';
-
-import initBasket from '../init-basket';
-
-jest.mock('../init-basket');
 
 describe('YieldProvider', () => {
   describe('render', () => {
@@ -20,32 +15,21 @@ describe('YieldProvider', () => {
         children,
         value: {
           initBasket: expect.any(Function),
-          baskets: {},
+          baskets: expect.any(Map),
         },
       });
     });
   });
 
-  describe('initBasket', () => {
-    it('should add basket to state', () => {
+  describe('state', () => {
+    it('should have basket registry in state', () => {
       const children = <div />;
       const instance = shallow(
         <YieldProvider>{children}</YieldProvider>
       ).instance();
-      instance.initBasket(basketMock);
-      expect(initBasket).toHaveBeenCalledWith(basketMock, undefined);
-      expect(instance.state.baskets).toHaveProperty(basketMock.key);
-    });
-
-    it('should add basket to state with initial state', () => {
-      const children = <div />;
-      const initialStates = { 'basket-key': { count: 1 } };
-      const instance = shallow(
-        <YieldProvider initialStates={initialStates}>{children}</YieldProvider>
-      ).instance();
-      instance.initBasket(basketMock);
-      expect(initBasket).toHaveBeenCalledWith(basketMock, { count: 1 });
-      expect(instance.state.baskets).toHaveProperty(basketMock.key);
+      expect(instance.registry).toBeDefined();
+      expect(instance.state.baskets).toBe(instance.registry.baskets);
+      expect(instance.state.initBasket).toBe(instance.registry.initBasket);
     });
   });
 });

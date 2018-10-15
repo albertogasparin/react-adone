@@ -37,10 +37,16 @@ export type BasketAction<ST> = (
   getState: GetState<ST>
 ) => *;
 
-export type basketInstance<ST, AC> = {
+export type BasketInstance<ST, AC> = {
   store: BasketStore<ST>,
   actions: AC,
 };
+
+declare export class Registry {
+  initialStates: { [key: string]: any };
+  baskets: Map<string, BasketInstance<any, any>>;
+  initBasket: <ST, AC>(Basket<ST, AC>) => BasketInstance<ST, AC>;
+}
 
 declare export class Yield<ST, AC, PI> extends React$Component<
   | {|
@@ -58,7 +64,7 @@ declare export class Yield<ST, AC, PI> extends React$Component<
       pick: null,
     |}
 > {
-  basket: basketInstance<ST, AC>;
+  basket: BasketInstance<ST, AC>;
 }
 
 declare export class YieldProvider extends React$Component<
@@ -66,10 +72,12 @@ declare export class YieldProvider extends React$Component<
     initialStates?: { [key: string]: any },
   },
   {
-    baskets: { [key: string]: basketInstance<any, any> },
-    initBasket: <ST, AC>(Basket<ST, AC>) => basketInstance<ST, AC>,
+    baskets: $PropertyType<Registry, 'baskets'>,
+    initBasket: $PropertyType<Registry, 'initBasket'>,
   }
-> {}
+> {
+  registry: Registry;
+}
 
 type MiddlewareResult = { changes: any[] };
 export type Middleware = (
@@ -79,10 +87,6 @@ export type Middleware = (
 declare export var defaults: {
   devtools: boolean,
   middlewares: Set<Middleware>,
-};
-
-export type fallbackProviderState = {
-  initialStates: { [key: string]: any },
 };
 
 declare export function createYield<ST, AC>(
