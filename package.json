@@ -22,7 +22,7 @@
   "scripts": {
     "build:cjs": "babel src/ -d lib/cjs --ignore **/__tests__ --presets @babel/env",
     "build:esm": "babel src/ -d lib/esm --ignore **/__tests__",
-    "build:flow": "cp src/index.js.flow lib/esm/index.js.flow",
+    "build:flow": "echo lib/cjs lib/esm | xargs -n 1 cp src/index.js.flow",
     "build": "rm -rf ./lib && npm run build:cjs -s && npm run build:esm -s && npm run build:flow -s",
     "test": "jest",
     "flow": "flow --max-warnings=0",
