@@ -8,6 +8,7 @@ export default class YieldProvider extends Component {
   static propTypes = {
     children: PropTypes.node,
     initialStates: PropTypes.object,
+    actionExtraArgument: PropTypes.object,
   };
 
   static defaultProps = {
@@ -16,7 +17,10 @@ export default class YieldProvider extends Component {
 
   constructor(props) {
     super(props);
-    this.registry = new BasketRegistry(props.initialStates);
+    this.registry = new BasketRegistry(
+      props.initialStates,
+      props.actionExtraArgument
+    );
     this.state = {
       baskets: this.registry.baskets,
       initBasket: this.registry.initBasket,

@@ -32,9 +32,10 @@ export type BasketStore<ST> = {|
   produce: Produce<ST>,
 |};
 
-export type BasketAction<ST> = (
+export type BasketAction<ST, EX = *> = (
   produce: Produce<ST>,
-  getState: GetState<ST>
+  getState: GetState<ST>,
+  extraArg: EX
 ) => *;
 
 export type BasketInstance<ST, AC> = {
@@ -46,7 +47,10 @@ declare export class Registry {
   initialStates: { [key: string]: any };
   baskets: Map<string, BasketInstance<any, any>>;
   initBasket: <ST, AC>(Basket<ST, AC>) => BasketInstance<ST, AC>;
+  setActionExtraArgument: any => void;
 }
+
+declare export var defaultRegistry: Registry;
 
 declare export class Yield<ST, AC, PI> extends React$Component<
   | {|
@@ -70,6 +74,7 @@ declare export class Yield<ST, AC, PI> extends React$Component<
 declare export class YieldProvider extends React$Component<
   {
     initialStates?: { [key: string]: any },
+    actionExtraArgument?: any,
   },
   {
     baskets: $PropertyType<Registry, 'baskets'>,

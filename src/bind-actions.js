@@ -1,4 +1,4 @@
-export default function bindActions(actions, store) {
+export default function bindActions(actions, store, extraArg) {
   return Object.keys(actions).reduce((acc, k) => {
     // Using a custom produce so we can name fn for better debuggability
     const namedProduce = fn => {
@@ -7,7 +7,8 @@ export default function bindActions(actions, store) {
       });
       store.produce(fn);
     };
-    acc[k] = (...args) => actions[k](...args)(namedProduce, store.getState);
+    acc[k] = (...args) =>
+      actions[k](...args)(namedProduce, store.getState, extraArg);
     return acc;
   }, {});
 }

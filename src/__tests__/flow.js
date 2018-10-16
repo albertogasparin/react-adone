@@ -13,14 +13,15 @@ import {
  * Basket types tests
  */
 type State = {| count: number |};
+type ExtraArg = {| api: () => void |};
 
 let Test;
 let TypeYield;
 let basket: Basket<State, typeof actions>;
 
 const actions = {
-  increment: (n: number): BasketAction<State> => (produce, getState) => {
-    // Produce tests
+  // Produce tests
+  increment: (n: number): BasketAction<State> => produce => {
     // $ExpectError Produce should return state or undefined
     produce(() => '');
 
@@ -29,10 +30,36 @@ const actions = {
       draft.foo = 1;
     });
 
-    // GetState tests
+    // correct
+    produce(draft => {
+      draft.count = 2;
+    });
+    produce(() => ({ count: 0 }));
+  },
+
+  // GetState tests
+  decrement: (): BasketAction<State> => (produce, getState) => {
     const state = getState();
+    // $ExpectError State should be of type State
+    const bla = state.bla;
     // $ExpectError State should not be considered writable
     state.count = 1;
+
+    // correct
+    const { count } = state;
+  },
+
+  // actionExtraArgument tests
+  double: (): BasketAction<State, ExtraArg> => (
+    produce,
+    getState,
+    extraArg
+  ) => {
+    // $ExpectError extraArg should be of type ExtraArg
+    const bla = extraArg.bla;
+
+    // Correct
+    const { api } = extraArg;
   },
 };
 
@@ -152,3 +179,4 @@ Test = (
 
 // Correct
 Test = <YieldProvider initialStates={{ k: {} }}>bla</YieldProvider>;
+Test = <YieldProvider actionExtraArgument={{ url: '' }}>bla</YieldProvider>;

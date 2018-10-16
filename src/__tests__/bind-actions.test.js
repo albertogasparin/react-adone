@@ -8,24 +8,25 @@ jest.mock('../middlewares');
 
 describe('bindActions', () => {
   it('should return all actions bound', () => {
-    const result = bindActions(basketMock.actions, storeMock, []);
+    const result = bindActions(basketMock.actions, storeMock);
     expect(result).toEqual({
       increase: expect.any(Function),
       decrease: expect.any(Function),
     });
   });
 
-  it('should bound actions providing produce and getState', () => {
-    const action2 = jest.fn();
+  it('should bound actions providing produce, getState and optional extra args', () => {
+    const actionInner = jest.fn();
     const produce = jest.fn();
-    basketMock.actions.increase.mockReturnValue(action2);
+    basketMock.actions.increase.mockReturnValue(actionInner);
     combineMiddlewares.mockReturnValue(produce);
-    const result = bindActions(basketMock.actions, storeMock, []);
+    const result = bindActions(basketMock.actions, storeMock, { url: '' });
     result.increase(1);
     expect(basketMock.actions.increase).toHaveBeenCalledWith(1);
-    expect(action2).toHaveBeenCalledWith(
+    expect(actionInner).toHaveBeenCalledWith(
       expect.any(Function),
-      storeMock.getState
+      storeMock.getState,
+      { url: '' }
     );
   });
 });

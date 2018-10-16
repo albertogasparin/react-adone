@@ -75,7 +75,9 @@ I provided few examples to see Adone in action. Run `npm run start` and then go 
 
 ## Advanced usage
 
-#### Basket async actions
+#### Basket async actions and extra arguments
+
+Like [redux-thunk](https://github.com/reduxjs/redux-thunk), basket actions can be async and also receive 3 arguments: `produce`, `getState` and an optional, configurable 3rd argument.
 
 ```js
 // baskets/todo.js
@@ -85,15 +87,15 @@ const defaultState = {
 };
 
 const actions = {
-  // the mutator function cannot be async
-  // but the thunk returned by the action sure can
-  load: () => async (produce, getState) => {
+  // the mutator function (passed to produce) cannot be async
+  // but the thunk returned by the action can
+  load: () => async (produce, getState, { api }) => {
     if (getState().loading === true) return;
     produce(function setLoading(draft) {
       draft.loading = true;
     });
 
-    const todos = await fetch('/todos').then(r => r.json());
+    const todos = await api.get('/todos');
     produce(function setData(draft) {
       draft.loading = false;
       draft.data = todos;
@@ -104,7 +106,26 @@ const actions = {
 export default { key: 'todo', defaultState, actions };
 ```
 
-Look at `./examples` folder for more.
+```js
+// app.js
+import { YieldProvider, Yield } from 'react-adone';
+import todoBasket from './baskets/todo';
+import axios from 'axios';
+
+const App = () => (
+  <YieldProvider actionExtraArgument={{ api: axios }}>
+    <Yield from={todoBasket}>
+      {({ load }) => <TriggerComponent onMount={load} />}
+    </Yield>
+  </YieldProvider>
+);
+
+// if you are not using the provider, you can set the 3rd argument
+// by importing `defaultRegistry` and calling
+// defaultRegistry.setActionExtraArgument({ api: axios })
+```
+
+Look at `./examples` folder for more use cases.
 
 #### Middlewares
 

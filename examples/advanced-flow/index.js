@@ -6,6 +6,9 @@ import { YieldProvider, defaults, type Middleware } from 'react-adone';
 import UserList from './components/user-list';
 import TodoList from './components/todo-list';
 
+/**
+ * Add simple logger middleware
+ */
 const mw: Middleware = store => next => fn => {
   const result = next(fn);
   console.log('Changed on', store.key, result.changes); // eslint-disable-line no-console
@@ -13,6 +16,9 @@ const mw: Middleware = store => next => fn => {
 };
 defaults.middlewares.add(mw);
 
+/**
+ * Main App
+ */
 class App extends Component<{}> {
   render() {
     return (
