@@ -27,10 +27,12 @@ describe('Yield', () => {
   const children = jest.fn().mockReturnValue(null);
 
   const modes = {
-    withProvider: () => {
+    withProvider: (props = {}) => {
       const getElement = () => (
         <YieldProvider>
-          <Yield from={basketMock}>{children}</Yield>
+          <Yield from={basketMock} {...props}>
+            {children}
+          </Yield>
         </YieldProvider>
       );
       const getShallow = () =>
@@ -45,8 +47,12 @@ describe('Yield', () => {
         children,
       };
     },
-    withoutProvider: () => {
-      const getElement = () => <Yield from={basketMock}>{children}</Yield>;
+    withoutProvider: (props = {}) => {
+      const getElement = () => (
+        <Yield from={basketMock} {...props}>
+          {children}
+        </Yield>
+      );
       const getShallow = () => shallow(getElement());
       const getMount = () => mount(getElement());
       return {
@@ -156,6 +162,18 @@ describe('Yield', () => {
         expect(instance.unsubscribeStore).toEqual(unsubscribeMock);
         instance.componentWillUnmount();
         expect(unsubscribeMock).toHaveBeenCalled();
+      });
+
+      it('should render children with pick return value', () => {
+        const pick = jest.fn().mockReturnValue({ foo: 1 });
+        const { getMount, children } = setup({ pick, withProps: { prop: 1 } });
+        getMount();
+        expect(pick).toHaveBeenCalledWith(basketMock.defaultState, { prop: 1 });
+        expect(children).toHaveBeenCalledWith({
+          foo: 1,
+          increase: expect.any(Function),
+          decrease: expect.any(Function),
+        });
       });
     });
   });

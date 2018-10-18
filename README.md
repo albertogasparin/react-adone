@@ -222,8 +222,23 @@ export const TodosCount = () => (
 );
 ```
 
+If you want to pass spcific props to the selector, you can set `withProps` prop on `Yield` and that object will be the second argument of the selector:
+
+```js
+// button-increment.js
+import { Yield } from 'react-adone';
+import todoBasket, { selectors } from './baskets/todo';
+
+export const TodoList = ({ status }) => (
+  <Yield from={todoBasket} pick={selectors.filterByStatus} withProps={{ status: 'todo' }}>
+    {({ todos }) => /* render... */}
+  </Yield>
+);
+```
+
 A useful value of `pick` is `null`: when so, `Yield` children will not re-render on store state change
-(but will if parent re-renders, as Adone is **not** using `PureComponent` nor `shouldComponentUpdate`)
+(but will if parent re-renders, as Adone is **not** using `PureComponent` nor `shouldComponentUpdate`).
+`null` is useful when children just have to trigger actions on the basket:
 
 ```js
 // button-increment.js

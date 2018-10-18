@@ -54,18 +54,21 @@ declare export var defaultRegistry: Registry;
 
 declare export class Yield<ST, AC, PI> extends React$Component<
   | {|
-      from: Basket<ST, AC>,
       children: YieldRenderPropFunction<ST, AC>,
+      from: Basket<ST, AC>,
+      withProps?: {},
     |}
   | {|
-      from: Basket<ST, AC>,
       children: YieldRenderPropFunction<PI, AC>,
+      from: Basket<ST, AC>,
       pick: ST => PI,
+      withProps?: {},
     |}
   | {|
-      from: Basket<ST, AC>,
       children: YieldRenderPropFunction<{||}, AC>,
+      from: Basket<ST, AC>,
       pick: null,
+      withProps?: {},
     |}
 > {
   basket: BasketInstance<ST, AC>;
@@ -73,7 +76,7 @@ declare export class Yield<ST, AC, PI> extends React$Component<
 
 declare export class YieldProvider extends React$Component<
   {
-    initialStates?: { [key: string]: any },
+    initialStates?: {},
     actionExtraArgument?: any,
   },
   {

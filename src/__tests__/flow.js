@@ -128,6 +128,11 @@ Test = (
     {({ increment }) => increment(1)}
   </Yield>
 );
+Test = (
+  <Yield from={basket} withProps={{ foo: 1 }}>
+    {() => null}
+  </Yield>
+);
 
 /**
  * createYield types tests

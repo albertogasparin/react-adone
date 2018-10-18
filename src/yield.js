@@ -15,6 +15,7 @@ export default class Yield extends Component {
       actions: PropTypes.object.isRequired,
     }).isRequired,
     pick: PropTypes.func,
+    withProps: PropTypes.object,
   };
 
   basket = null;
@@ -35,9 +36,9 @@ export default class Yield extends Component {
   }
 
   getBasketState() {
-    const { pick } = this.props;
+    const { pick, withProps } = this.props;
     const state = this.basket ? this.basket.store.getState() : {};
-    return pick ? pick(state) : state;
+    return pick ? pick(state, withProps) : state;
   }
 
   onUpdate = (isMount = false) => {
