@@ -75,16 +75,9 @@ describe('Yield', () => {
         mockRegistry.baskets.clear();
       });
 
-      it('should render context consumer and not children', () => {
-        const { getShallow, children } = setup();
-        const wrapper = getShallow();
-        expect(wrapper.name()).toEqual('ContextConsumer');
-        expect(children).not.toHaveBeenCalled();
-      });
-
       it('should create a basket if first time', () => {
-        const { getMount } = setup();
-        getMount();
+        const { getShallow } = setup();
+        getShallow();
         expect(mockRegistry.initBasket).toHaveBeenCalledWith(basketMock);
       });
 
@@ -93,14 +86,14 @@ describe('Yield', () => {
           store: storeMock,
           actions: {},
         });
-        const { getMount } = setup();
-        getMount();
+        const { getShallow } = setup();
+        getShallow();
         expect(mockRegistry.initBasket).not.toHaveBeenCalled();
       });
 
       it('should save basket instance locally and listen', () => {
-        const { getMount } = setup();
-        const instance = getMount().instance();
+        const { getShallow } = setup();
+        const instance = getShallow().instance();
         expect(instance.basket).toEqual({
           actions: expect.any(Object),
           store: storeMock,
@@ -108,9 +101,9 @@ describe('Yield', () => {
         expect(storeMock.subscribe).toHaveBeenCalledWith(instance.onUpdate);
       });
 
-      it('should render children once', () => {
-        const { getMount, children } = setup();
-        getMount();
+      it('should render children with basket data and actions', () => {
+        const { getShallow, children } = setup();
+        getShallow();
         expect(children).toHaveBeenCalledTimes(1);
         expect(children).toHaveBeenCalledWith({
           count: 0,
@@ -145,7 +138,7 @@ describe('Yield', () => {
           .instance()
           .onUpdate();
 
-        expect(storeMock.getState).toHaveBeenCalledTimes(4);
+        expect(storeMock.getState).toHaveBeenCalledTimes(3);
         expect(children).toHaveBeenCalledTimes(2);
         expect(children).toHaveBeenLastCalledWith({
           count: 1,
