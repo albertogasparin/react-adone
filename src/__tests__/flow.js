@@ -93,9 +93,7 @@ Test = (
 
 Test = (
   // $ExpectError from should be a valid basket
-  <Yield from={{ key: '', defaultState: {}, actions: null }}>
-    {args => null}
-  </Yield>
+  <Yield from={{ key: '', defaultState: {} }}>{args => null}</Yield>
 );
 
 Test = (
@@ -109,6 +107,11 @@ Test = (
 );
 
 Test = (
+  // $ExpectError Basket state values should be correcly typed
+  <Yield from={basket}>{({ count }) => count.bla}</Yield>
+);
+
+Test = (
   // $ExpectError Child arg shape should be just actions
   <Yield from={basket} pick={null}>
     {({ count }) => count}
@@ -116,7 +119,7 @@ Test = (
 );
 
 // Correct
-Test = <Yield from={basket}>{({ count }) => count + 0}</Yield>;
+Test = <Yield from={basket}>{({ count }) => count * 1}</Yield>;
 Test = <Yield from={basket}>{({ increment }) => increment(1)}</Yield>;
 Test = (
   <Yield from={basket} pick={() => ({ baz: 1 })}>

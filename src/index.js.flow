@@ -13,16 +13,13 @@ type Produce<ST> = (modifier: (ST) => ST | void) => void;
 type GetState<ST> = () => $ReadOnly<ST>;
 type BasketStoreUnsubscribe = () => void;
 
-type YieldRenderPropFunction<S, A> = ({
-  ...$Exact<$ReadOnly<S>>,
-  ...$Exact<A>,
-}) => Node;
+type YieldRenderPropFunction<S, A> = ($Exact<$ReadOnly<S>> & $Exact<A>) => Node;
 
-export type Basket<ST, AC> = {
+export type Basket<ST, AC> = {|
   key: string,
   defaultState: ST,
   actions: AC,
-};
+|};
 
 export type BasketStore<ST> = {|
   getState: GetState<ST>,
