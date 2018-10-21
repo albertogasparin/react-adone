@@ -138,7 +138,7 @@ describe('Yield', () => {
           .instance()
           .onUpdate();
 
-        expect(storeMock.getState).toHaveBeenCalledTimes(3);
+        expect(storeMock.getState).toHaveBeenCalledTimes(4);
         expect(children).toHaveBeenCalledTimes(2);
         expect(children).toHaveBeenLastCalledWith({
           count: 1,

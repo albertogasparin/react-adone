@@ -1,27 +1,26 @@
 # React Adone
 
-[![npm](https://img.shields.io/npm/v/react-adone.svg?maxAge=2592000)](https://www.npmjs.com/package/react-adone)
+[![npm](https://img.shields.io/npm/v/react-adone.svg)](https://www.npmjs.com/package/react-adone)
+[![npm bundle size (minified + gzip)](https://img.shields.io/bundlephobia/minzip/react-adone.svg)](https://bundlephobia.com/result?p=react-adone)
 [![License](https://img.shields.io/:license-mit-blue.svg)](http://albertogasparin.mit-license.org)
 [![CircleCI](https://circleci.com/gh/albertogasparin/react-adone.svg?style=shield&circle-token=17a5f372d198e27098226779bc1afd8fd6a2fb3a)](https://circleci.com/gh/albertogasparin/react-adone)
 [![Dependency Status](https://david-dm.org/albertogasparin/react-adone.svg)](https://david-dm.org/albertogasparin/react-adone)
-[![devDependency Status](https://david-dm.org/albertogasparin/react-adone/dev-status.svg)](https://david-dm.org/albertogasparin/react-adone#info=devDependencies)
 
-Yes, this is another Redux-like/Context-alternative solution. Probably you better off using more well known libs unless:
+Yes, this is another Redux-like/Context-alternative solution. Probably you should use more well known libs unless:
 
 - You don't want to create hundreds of Contexts to share pieces of state
 - You have a huge app and a single Redux store is not possible
-- Your tree is already deep enought and Context will make things even worse
-- You have high performance requirements (Adone uses some tricks to avoid duplicate renders and uses the Context API just on first render because it is [a bit slower](https://github.com/facebook/react/issues/13739) than a subscription based store)
-- You want your app still working even if you omit the Provider
-- You still want to use Redux Devtools (because it's handy!)
+- You have high performance requirements (Adone uses some tricks to avoid duplicate renders and uses Context API only to get the baskets registry because [it's faster](https://github.com/facebook/react/issues/13739))
+- You need your app working even without the Provider
+- You care about dev experience (support for Redux Devtools, better testability, flow typings)
 
 ## Philosophy
 
 Adone is heavily inspired by Redux, the main difference is the lack of reducers. Store name, actions, default state and selectors are combined in a single entity called Basket. `Yield` is the React component that "yields" from a Basket and returns it's store state (or part of it) and the actions already bound to it.
 
-The basket is just an object and `Yield` is responsible to get the instantiated store (using the `key` attribute) or creating a new one. That makes sharing Baskets across you project extremely cheap.
+`Yield` is responsible to get the instantiated basket store (using the `key` attribute) or creating a new one. That makes sharing baskets across you project extremely easy.
 
-Similar to Redux, actions receive a `produce` function (read dispatcher) that gets called with mutator that receives a draft state that can either be modified directly or replaced by returning a new one.
+Similar to Redux thunk, actions receive a `produce` function (read dispatcher) that gets called with mutator that receives a draft state that can either be modified directly or replaced by returning a new one.
 
 ## Basic usage
 
@@ -52,6 +51,7 @@ import { YieldProvider, Yield } from 'react-adone';
 import counterBasket from './baskets/counter';
 
 const App = () => (
+  {/* Provider is optional. If omitted baskets will be registered to `defaultRegistry` */}
   <YieldProvider>
     <h1>My counter</h1>
     <Yield from={counterBasket}>
@@ -67,17 +67,20 @@ const App = () => (
 );
 ```
 
+For more details about `produce` works, please refer to [immer documentation](https://github.com/mweststrate/immer)
+
 ## Running examples
 
 I provided few examples to see Adone in action. Run `npm run start` and then go and check each folder:
 
+- Basic example with Flow typing `http://localhost:8080/basic-flow/`
 - Advanced async example with Flow typing `http://localhost:8080/advanced-flow/`
 
 ## Advanced usage
 
 #### Basket async actions and extra arguments
 
-Like [redux-thunk](https://github.com/reduxjs/redux-thunk), basket actions can be async and also receive 3 arguments: `produce`, `getState` and an optional, configurable 3rd argument.
+Like [redux-thunk](https://github.com/reduxjs/redux-thunk), basket actions can be async and they receive 3 arguments: `produce`, `getState` and an optional, configurable 3rd argument.
 
 ```js
 // baskets/todo.js
@@ -173,7 +176,7 @@ defaults.devtools = false;
 
 #### Basket state rehydration
 
-If you server side render your content, you might wanto to rehydrate your baskets state with the correct data.
+If you server side render your content, you might want to rehydrate your baskets state with the correct data.
 `YieldProvider` (and `fallbackProviderState`) supports `initialStates` prop where you can define baskets initial status by key.
 
 ```js
@@ -222,7 +225,7 @@ export const TodosCount = () => (
 );
 ```
 
-If you want to pass spcific props to the selector, you can set `withProps` prop on `Yield` and that object will be the second argument of the selector:
+If you want to pass props to the selector, you can set `withProps` prop on `Yield` and that object will be the second argument of the selector:
 
 ```js
 // button-increment.js
@@ -300,3 +303,8 @@ const UserProject = () => (
 
 To test your changes you can run the examples (with `npm run start`).
 Also, make sure you run `npm run preversion` before creating you PR so you will double check that linting, types and tests are fine.
+
+## Thanks
+
+This library merges ideas from redux, react-redux, redux-thunk, react-copy-write, bey, react-apollo just to name a few.
+Moreover it has been the result of months of discussions with [ferborva](https://github.com/ferborva), [pksjce](https://github.com/pksjce), [TimeRaider](https://github.com/TimeRaider), [dpisani](https://github.com/dpisani), [JedWatson](https://github.com/JedWatson), and other devs at [Atlassian](https://github.com/atlassian).
