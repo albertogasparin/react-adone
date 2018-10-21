@@ -24,6 +24,10 @@ jobs:
           name: Install Dependencies
           command: npm i --silent
 
+      - run:
+          name: Install Extra Dependencies
+          command: npm i codecov --silent
+
       - save_cache:
           paths:
             - node_modules
@@ -41,8 +45,12 @@ jobs:
           name: Run Unit Tests
           command: npm run test -- --coverage
 
+      - run:
+          name: Upload coverage results
+          command: ./node_modules/.bin/codecov
+
       - store_test_results:
-          path: ~/repo/artifacts
+          path: ~/repo/coverage
 
       - store_artifacts:
           path: ~/repo/artifacts
