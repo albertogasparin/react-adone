@@ -1,6 +1,7 @@
 
 # Ignore dev files
 .vscode
+.circleci
 .editorconfig
 .eslintrc.js
 *.config.js
