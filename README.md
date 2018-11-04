@@ -69,7 +69,7 @@ const App = () => (
 
 ## Documentation
 
-[See the docs folder](./docs/README.md).
+[Visit the documentation website](https://albertogasparin.github.io/react-adone/) or [check the docs folder](docs/README.md).
 
 ## Examples
 

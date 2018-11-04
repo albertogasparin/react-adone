@@ -32,4 +32,4 @@ const App = () => (
 );
 ```
 
-The power of `YieldScope` is that you can expand or reduce the scope at will, without requiring any change on the children. That means you can start with a localised scope and then if you need to access the same state elsewere you can just move `YieldScope` up in the tree (or make the scope global providing an `id`).
+The power of `YieldScope` is that you can expand or reduce the scope at will, without requiring any change on the children. That means you can start with a localised scope and then if you need to access the same state elsewhere you can just move `YieldScope` up in the tree (or make the scope global providing an `id`).
