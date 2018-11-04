@@ -7,9 +7,11 @@ Compared to other state management libraries, Adone does not require a provider 
 import { YieldProvider } from 'react-adone';
 import axios from 'axios';
 
+const initialData = { counter: { count: 10 } };
+
 const App = () => (
   <YieldProvider
-    initialStates={{ counter: { count: 10 } }}
+    initialStates={initialData}
     actionExtraArgument={{ api: axios }}
   >
     {/* your app */}
@@ -23,8 +25,10 @@ The same configuration passed to the `YieldProvider` is available for the defaul
 import { defaultRegistry } from 'react-adone';
 import axios from 'axios';
 
+const initialData = { counter: { count: 10 } };
+
 defaultRegistry.config({
-  initialStates: { counter: { count: 10 } },
+  initialStates: initialData,
   actionExtraArgument: { api: axios },
 });
 
