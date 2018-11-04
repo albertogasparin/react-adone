@@ -6,14 +6,7 @@
 [![CircleCI](https://circleci.com/gh/albertogasparin/react-adone.svg?style=shield&circle-token=17a5f372d198e27098226779bc1afd8fd6a2fb3a)](https://circleci.com/gh/albertogasparin/react-adone)
 [![codecov](https://codecov.io/gh/albertogasparin/react-adone/branch/master/graph/badge.svg)](https://codecov.io/gh/albertogasparin/react-adone)
 
-Yes, this is another Redux-like/Context-alternative solution. Probably you should use more well known libs unless:
-
-- You don't want to create hundreds of Contexts to share pieces of state
-- You have a huge app and a single Redux store is not possible
-- You have high performance requirements (Adone uses some tricks to avoid duplicate renders and uses Context API only to get the baskets registry because [it's faster](https://github.com/facebook/react/issues/13739))
-- You need your app working even without the Provider
-- You care about dev experience (support for Redux Devtools, better testability, flow typings)
-- You want the freedom to set and change your data scope anytime
+Taking the good parts of Redux and React Context to build a flexible, scalable and easy to use state management solution.
 
 ## Philosophy
 
@@ -24,6 +17,12 @@ Adone is heavily inspired by Redux, the main difference is the lack of reducers.
 Similar to Redux thunk, actions receive a `produce` function (read dispatcher) that gets called with mutator that receives a draft state that can either be modified directly or replaced by returning a new one.
 
 ## Basic usage
+
+```sh
+npm i react-adone
+# or
+yarn add react-adone
+```
 
 #### Defining a basket and using `Yield` consumer and provider
 

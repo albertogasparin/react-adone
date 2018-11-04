@@ -1,25 +1,50 @@
-## React Adone docs
+# React Adone
 
-- [Introduction](./introduction/README.md)
+[![npm](https://img.shields.io/npm/v/react-adone.svg)](https://www.npmjs.com/package/react-adone)
+[![npm bundle size (minified + gzip)](https://img.shields.io/bundlephobia/minzip/react-adone.svg)](https://bundlephobia.com/result?p=react-adone)
+[![License](https://img.shields.io/:license-MIT-blue.svg)](http://albertogasparin.mit-license.org)
+[![CircleCI](https://circleci.com/gh/albertogasparin/react-adone.svg?style=shield&circle-token=17a5f372d198e27098226779bc1afd8fd6a2fb3a)](https://circleci.com/gh/albertogasparin/react-adone)
+[![codecov](https://codecov.io/gh/albertogasparin/react-adone/branch/master/graph/badge.svg)](https://codecov.io/gh/albertogasparin/react-adone)
 
-  - [Motivation](./introduction/motivation.md)
+Taking the good parts of Redux and React Context to build a flexible, scalable and easy to use state management solution.
 
-- [Basics](./basics/README.md)
+```sh
+npm i react-adone
+# or
+yarn add react-adone
+```
 
-  - [Basket](./basics/basket.md)
-  - [Actions](./basics/actions.md)
-  - [Using baskets with `Yield` component](./basics/yield-component.md)
-  - [Provider or provider-less](./basics/yield-provider.md)
+```js
+import { Yield } from 'react-adone';
 
-- [Advanced](./advanced/README.md)
+const basket = {
+  // required and unique
+  key: 'counter',
+  // default value of the store on initialisation
+  defaultState = {
+    count: 0,
+  },
+  // actions that trigger store mutation
+  actions: {
+    increment: () => produce => {
+      // mutate state directly thanks to immer.js
+      produce(draft => {
+        draft.count += 1;
+      });
+    },
+  },
+};
 
-  - [Pick](./advanced/pick.md)
-  - [Basket scopes with `YieldScope`](./advanced/yield-scope.md)
-  - [Named `Yield` components](./advanced/create-yield.md)
-  - [Devtools](./advanced/devtools.md)
-  - [State rehydration](./advanced/rehydration.md)
-  - [Middlewares](./advanced/middlewares.md)
-
-- [Recipes](./recipes/README.md)
-
-  - [Composition](./recipes/composition.md)
+const App = () => (
+  <h1>My counter</h1>
+  <Yield from={counterBasket}>
+    {/* The basket actions and store state get spread for easy consumption */}
+    {({ count, increment }) => (
+      <div>
+        {count}
+        <button onClick={increment}>Add +1</button>
+      </div>
+    )}
+  </Yield>
+);
+```
