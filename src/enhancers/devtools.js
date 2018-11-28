@@ -21,10 +21,14 @@ const withDevtools = createStore => (...args) => {
     let devTools;
     const produce = fn => {
       const result = origProduce(fn);
-      if (!devTools) {
-        devTools = connectDevTools(store);
+      try {
+        if (!devTools) {
+          devTools = connectDevTools(store);
+        }
+        devTools.send(fn.displayName, store.getState(), {}, store.key);
+      } catch (err) {
+        /* ignore devtools errors */
       }
-      devTools.send(fn.displayName, store.getState(), {}, store.key);
       return result;
     };
     store.produce = produce;

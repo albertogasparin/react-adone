@@ -1,4 +1,4 @@
 export default {
-  devtools: true,
+  devtools: false,
   middlewares: new Set(),
 };
