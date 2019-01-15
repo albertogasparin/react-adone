@@ -81,12 +81,8 @@ export default class Yield extends Component {
     if (!this.basket) return;
     const prevState = this.state;
     const nextState = this.getBasketState();
-    // we could call setState but in reality Adone uses state only for
-    // better dev experience, so assigning it sync and calling forceUpdate
-    // is harmless (ReactFiberNewContext uses FU too)
-    this.state = nextState;
     if (!shallowEqual(prevState, nextState)) {
-      this.forceUpdate();
+      this.setState(nextState);
     }
   };
 

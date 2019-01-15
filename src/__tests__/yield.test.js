@@ -104,11 +104,10 @@ describe('Yield', () => {
       it('should update when store calls update listener', () => {
         const { getMount } = setup();
         const instance = getMount().instance();
-        instance.forceUpdate = jest.fn();
+        instance.setState = jest.fn();
         storeMock.getState.mockReturnValue({ count: 1 });
         instance.onUpdate();
-        expect(instance.state).toEqual({ count: 1 });
-        expect(instance.forceUpdate).toHaveBeenCalled();
+        expect(instance.setState).toHaveBeenCalledWith({ count: 1 });
       });
 
       it('should avoid re-render children just rendered from parent update', () => {
