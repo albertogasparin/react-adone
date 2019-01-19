@@ -1,6 +1,6 @@
 ## Named `Yield` components
 
-Adone exports an helper function to create yielded components from a specific basket so you don't have to specify a basket and a pick function every single time
+Adone exports a helper function to create yielded components from a specific basket so you don't have to specify a basket and a pick function every single time
 
 ```js
 // todo-components.js

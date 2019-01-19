@@ -17,7 +17,7 @@ yarn add react-adone
 ```js
 import { Yield } from 'react-adone';
 
-const basket = {
+const counterBasket = {
   // required and unique
   key: 'counter',
   // default value of the store on initialisation
