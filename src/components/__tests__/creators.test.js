@@ -7,12 +7,12 @@ import hash from '../../utils/hash';
 
 jest.mock('../../utils/hash', () => ({
   __esModule: true,
-  default: jest.fn(() => 'mockedHash'),
+  default: jest.fn(),
 }));
 
 describe('creators', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    hash.mockReturnValue('mockedHash');
   });
 
   describe('createComponents', () => {

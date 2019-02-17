@@ -4,7 +4,10 @@ import React from 'react';
 import { shallow, mount } from 'enzyme';
 
 import { basketMock, storeMock } from '../../__tests__/mocks';
-import BasketRegistry, { defaultRegistry } from '../../registry';
+import BasketRegistry, {
+  defaultRegistry,
+  default as registryDefaultExport,
+} from '../../registry';
 import { createComponents } from '../creators';
 
 const mockRegistry = {
@@ -15,7 +18,7 @@ const mockRegistry = {
 
 jest.mock('../../registry', () => ({
   __esModule: true,
-  default: jest.fn().mockImplementation(() => mockRegistry),
+  default: jest.fn(),
   defaultRegistry: {
     configure: jest.fn(),
     getBasket: jest.fn(),
@@ -28,8 +31,8 @@ const mockOnContainerUpdateInner = jest.fn();
 const { Subscriber, Container } = createComponents({
   initialState: basketMock.initialState,
   actions: basketMock.actions,
-  onContainerInit: jest.fn().mockReturnValue(mockOnContainerInitInner),
-  onContainerUpdate: jest.fn().mockReturnValue(mockOnContainerUpdateInner),
+  onContainerInit: () => mockOnContainerInitInner,
+  onContainerUpdate: () => mockOnContainerUpdateInner,
 });
 
 describe('Container', () => {
@@ -39,9 +42,9 @@ describe('Container', () => {
       actions: basketMock.actions,
     };
     defaultRegistry.getBasket.mockReturnValue(getBasketReturn);
+    registryDefaultExport.mockImplementation(() => mockRegistry);
     mockRegistry.getBasket.mockReturnValue(getBasketReturn);
     storeMock.getState.mockReturnValue(basketMock.initialState);
-    jest.clearAllMocks();
   });
 
   describe('constructor', () => {

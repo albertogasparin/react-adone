@@ -15,7 +15,9 @@ jest.mock('../../registry', () => {
   };
   return {
     __esModule: true,
-    default: jest.fn().mockImplementation(() => mockRegistry),
+    default() {
+      return mockRegistry;
+    },
     defaultRegistry: mockRegistry,
   };
 });
