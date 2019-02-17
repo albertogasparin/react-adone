@@ -1,15 +1,15 @@
 ## Creating selector components
 
-Adone allows you to create components that update only when a specific part of the state changes.
+Adone allows you to create components that return a specific (or manipulated) part of the state, and they recompute only when state (or props) change.
 
 ```js
 // todos-count.js
-import { createSelector } from 'react-adone';
+import { createSelectorComponent } from 'react-adone';
 import { TodoSubscriber } from './components/todo';
 
 const getTodosCount = state => ({ todosCount: state.todos.length }),
 
-const TodoCountSubscriber = createSelector(
+const TodoCountSubscriber = createSelectorComponent(
   TodoSubscriber, // subscriber to create selector from
   getTodosCount,  // selector function
   'TodoCountSubscriber' // optional selector component name
@@ -27,12 +27,12 @@ If you want to pass props to the selector, just add props to the selector subscr
 
 ```js
 // button-increment.js
-import { createSelector } from 'react-adone';
+import { createSelectorComponent } from 'react-adone';
 import { TodoSubscriber } from './components/todo';
 
 const getTodosByStatus = (state, props) => ({ todos: state.todos.filter(t => t.status === props.status) });
 
-const TodosSubscriber = createSelector(TodoSubscriber, getTodosCount)
+const TodosSubscriber = createSelectorComponent(TodoSubscriber, getTodosCount)
 
 export const TodoList = ({ status }) => (
   <TodosSubscriber status={status}>
@@ -47,10 +47,10 @@ So `null` is useful when children just have to trigger actions:
 
 ```js
 // button-increment.js
-import { createSelector } from 'react-adone';
+import { createSelectorComponent } from 'react-adone';
 import { CounterSubscriber } from './components/counter';
 
-const CounterActions = createSelector(
+const CounterActions = createSelectorComponent(
   CounterSubscriber,
   null,
   'CounterActions'
@@ -62,3 +62,25 @@ export const ButtonIncrement = () => (
   </CounterActions>
 );
 ```
+
+#### createSelectorComponent and createSelector
+
+In case you want to re-render your component only when a specific part of the state changes, you can enhance your selector with [reselect](https://github.com/reduxjs/reselect) `createSelector`
+
+```js
+import { createSelector } from 'reselect';
+import { TodoSubscriber } from './components/todo';
+
+const getFilteredTodos = createSelector(
+  state => state.data.todos,
+  state => state.statusFilter,
+  (todos, status) => todos.filter(t => t.status === status)
+);
+
+const FilteredTodosSubscriber = createSelectorComponent(
+  TodoSubscriber,
+  getFilteredTodos
+);
+```
+
+With the above code, if other attributes on the state do change (eg: `state.loading`), `FilteredTodosSubscriber` will not re-render

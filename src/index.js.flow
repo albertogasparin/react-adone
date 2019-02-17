@@ -95,13 +95,13 @@ declare export function createComponents<ST, AC, PR>({
   }>,
 };
 
-declare export function createSelector<SE, AC>(
+declare export function createSelectorComponent<SE, AC>(
   Subscriber: React$ComponentType<any>,
   selector: (state: any) => SE,
   displayName?: string
 ): React$ComponentType<{ children: RenderPropComponent<SE, AC> }>;
 
-declare export function createSelector<AC>(
+declare export function createSelectorComponent<AC>(
   Subscriber: React$ComponentType<any>,
   selector: null,
   displayName?: string

@@ -184,8 +184,8 @@ describe('Subscriber', () => {
         storeMock.getState.mockReturnValue({ count: 1 });
         instance.onUpdate();
         expect(children).toHaveBeenCalledTimes(1);
-        // make sure memoisation works as expected
-        expect(Subscriber.selector).toHaveBeenCalledTimes(1);
+        // check that on state change memoisation breaks
+        expect(Subscriber.selector).toHaveBeenCalledTimes(2);
         Subscriber.selector = undefined;
       });
 

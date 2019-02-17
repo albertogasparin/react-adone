@@ -4,7 +4,7 @@ import React from 'react';
 import {
   AdoneProvider,
   createComponents,
-  createSelector,
+  createSelectorComponent,
   type BasketAction,
   type Basket,
 } from '..';
@@ -94,9 +94,9 @@ Test = <Cc.Subscriber>{({ count }) => count + 0}</Cc.Subscriber>;
 Test = <Cc.Subscriber>{({ increment }) => increment(1)}</Cc.Subscriber>;
 
 /**
- * createSelector types tests
+ * createSelectorComponent types tests
  */
-TypeSelector = createSelector<{ baz: number }, typeof actions>(
+TypeSelector = createSelectorComponent<{ baz: number }, typeof actions>(
   Cc.Subscriber,
   () => ({ baz: 1 })
 );
@@ -110,10 +110,7 @@ Test = (
 Test = <TypeSelector>{({ baz }) => baz}</TypeSelector>;
 Test = <TypeSelector>{({ increment }) => increment(1)}</TypeSelector>;
 
-TypeSelector = createSelector<typeof actions>(
-  Cc.Subscriber,
-  null
-);
+TypeSelector = createSelectorComponent<typeof actions>(Cc.Subscriber, null);
 
 Test = (
   // $ExpectError Child arg shape should be just actions

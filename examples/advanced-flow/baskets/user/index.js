@@ -1,6 +1,6 @@
 // @flow
 
-import { createComponents, createSelector } from 'react-adone';
+import { createComponents, createSelectorComponent } from 'react-adone';
 import type { State } from './types';
 
 import * as actions from './actions';
@@ -24,10 +24,7 @@ export const {
   onContainerInit: actions.load,
 });
 
-export const UserSelectedSubscriber = createSelector<
+export const UserSelectedSubscriber = createSelectorComponent<
   $Call<typeof selectors.getSelected, State>,
   Actions
->(
-  UserSubscriber,
-  selectors.getSelected
-);
+>(UserSubscriber, selectors.getSelected);

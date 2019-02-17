@@ -2,7 +2,7 @@
 
 import ContainerClass from '../container';
 import SubscriberClass from '../subscriber';
-import { createComponents, createSelector } from '../creators';
+import { createComponents, createSelectorComponent } from '../creators';
 import hash from '../../utils/hash';
 
 jest.mock('../../utils/hash', () => ({
@@ -74,7 +74,7 @@ describe('creators', () => {
       expect(hash).toHaveBeenCalledWith('{"foo":"bar"}');
     });
   });
-  describe('createSelector', () => {
+  describe('createSelectorComponent', () => {
     it('should return a component with selector', () => {
       const selectorMock = jest.fn();
       const { Subscriber } = createComponents({
@@ -82,7 +82,7 @@ describe('creators', () => {
         actions: {},
         name: 'test',
       });
-      const SubscriberSelector = createSelector(
+      const SubscriberSelector = createSelectorComponent(
         Subscriber,
         selectorMock
       );

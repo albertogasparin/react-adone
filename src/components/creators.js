@@ -39,7 +39,11 @@ export function createComponents({
   };
 }
 
-export function createSelector(SubscriberComponent, selectorFn, displayName) {
+export function createSelectorComponent(
+  SubscriberComponent,
+  selectorFn,
+  displayName
+) {
   return class extends SubscriberComponent {
     static selector = selectorFn;
     static displayName =
