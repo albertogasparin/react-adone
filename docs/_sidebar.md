@@ -4,19 +4,19 @@
 
 - **Basics**
 
-  - [Basket](basics/basket.md)
-  - [Actions](basics/actions.md)
-  - [Using baskets with `Yield`](basics/yield-component.md)
-  - [Provider or provider-less](basics/yield-provider.md)
+  - [Creating components](./basics/create.md)
+  - [Actions](./basics/actions.md)
+  - [Using subscribers](./basics/subscriber.md)
+  - [Using container](./basics/container.md)
+  - [Provider or provider-less](./basics/yield-provider.md)
 
 - **Advanced**
 
-  - [Pick (aka selectors)](advanced/pick.md)
-  - [Basket scopes with `YieldScope`](advanced/yield-scope.md)
-  - [Named `Yield` components](advanced/create-yield.md)
-  - [Devtools support](advanced/devtools.md)
-  - [State rehydration](advanced/rehydration.md)
-  - [Middlewares](advanced/middlewares.md)
+  - [Selectors](./advanced/selector.md)
+  - [Container scopes](./advanced/container-scope.md)
+  - [Devtools](./advanced/devtools.md)
+  - [State rehydration](./advanced/rehydration.md)
+  - [Middlewares](./advanced/middlewares.md)
 
 - **Recipes**
 

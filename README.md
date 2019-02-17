@@ -10,11 +10,11 @@ Taking the good parts of Redux and React Context to build a flexible, scalable a
 
 ## Philosophy
 
-Adone is heavily inspired by Redux, the main difference is the lack of reducers. Store name, actions, default state and selectors are combined in a single entity called Basket. `Yield` is the React component that "yields" from a Basket and returns it's store state (or part of it) and the actions already bound to it.
+Adone is heavily inspired by Redux, the main difference is the lack of reducers. Store name, actions, default state and selectors are combined in a single entity called Basket. Instead of React Provider and Consumer, we have `Container` and `Subscriber` that define the store and make it's state (or part of it) and the actions available via render-prop API.
 
-`Yield` is responsible to get the instantiated basket store (using the `key` attribute) or creating a new one. That makes sharing baskets across you project extremely easy.
+Each `Subscriber` is responsible to get the instantiated store (creating a new one with `initialState` if necessary). That makes sharing state across you project extremely easy.
 
-Similar to Redux thunk, actions receive a mutator function (the default is similar to React `setState`) that gets called with an object that will be shallow merged with the current state to provide a new, fresh state.
+Similar to Redux thunk, actions receive a set of arguments to get and mutate the state. The default `setState` implementation is similar to React `setState`, called with an object that will be shallow merged with the current state. But you are free to replace that with something different, even like `immer` for instance.
 
 ## Basic usage
 
@@ -24,10 +24,11 @@ npm i react-adone
 yarn add react-adone
 ```
 
-#### Defining a basket and using `Yield` consumer and provider
+#### Creating a Subscriber
 
 ```js
-// baskets/counter.js
+import { createComponents } from 'react-adone';
+
 const initialState = {
   count: 0,
 };
@@ -35,26 +36,28 @@ const initialState = {
 const actions = {
   increment: () => ({ setState, getState }) => {
     // setState() shallow merge the provider partial state going through middlewares
-    // unlike React setState, it is syncronous and accepts just objects
+    // unlike React setState though, it is syncronous and accepts just objects
     setState({
       count: getState().count + 1,
     });
   },
 };
 
-export default { key: 'counter', initialState, actions };
+export const { Subscriber: CounterSubscriber } = createComponents({
+  initialState,
+  actions
+  name: 'counter', // optional, but helps with debugging
+});
 ```
 
 ```js
 // app.js
-import { YieldProvider, Yield } from 'react-adone';
-import counterBasket from './baskets/counter';
+import { CounterSubscriber } from './components/counter';
 
 const App = () => (
-  {/* Provider is optional. If omitted baskets will be registered to `defaultRegistry` */}
-  <YieldProvider>
+  <div>
     <h1>My counter</h1>
-    <Yield from={counterBasket}>
+    <CounterSubscriber>
       {/* The basket actions and store state get spread for easy consumption */}
       {({ count, increment }) => (
         <div>
@@ -62,8 +65,8 @@ const App = () => (
           <button onClick={increment}>+</button>
         </div>
       )}
-    </Yield>
-  </YieldProvider>
+    </CounterSubscriber>
+  </div>
 );
 ```
 
@@ -86,5 +89,5 @@ Also, make sure you run `npm run preversion` before creating you PR so you will 
 
 ## Thanks
 
-This library merges ideas from redux, react-redux, redux-thunk, react-copy-write, bey, react-apollo just to name a few.
+This library merges ideas from redux, react-redux, redux-thunk, react-copy-write, unstated, bey, react-apollo just to name a few.
 Moreover it has been the result of months of discussions with [ferborva](https://github.com/ferborva), [pksjce](https://github.com/pksjce), [TimeRaider](https://github.com/TimeRaider), [dpisani](https://github.com/dpisani), [JedWatson](https://github.com/JedWatson), and other devs at [Atlassian](https://github.com/atlassian).

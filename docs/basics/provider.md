@@ -4,23 +4,23 @@ Compared to other state management libraries, Adone does not require a provider 
 
 ```js
 // app.js
-import { YieldProvider } from 'react-adone';
+import { AdoneProvider } from 'react-adone';
 
-const initialData = { counter: { count: 10 } };
+const initialData = { 'nu718c@__global__': { count: 10 } };
 
 const App = () => (
   <YieldProvider initialStates={initialData}>{/* your app */}</YieldProvider>
 );
 ```
 
-The same configuration passed to the `YieldProvider` is available for the default basket registry, via the `config` method
+The same configuration passed to `AdoneProvider` is available for the default registry:
 
 ```js
 import { defaultRegistry } from 'react-adone';
 
-const initialData = { counter: { count: 10 } };
+const initialData = { 'nu718c@__global__': { count: 10 } };
 
-defaultRegistry.config({
+defaultRegistry.configure({
   initialStates: initialData,
 });
 

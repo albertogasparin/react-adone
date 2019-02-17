@@ -15,36 +15,39 @@ yarn add react-adone
 ```
 
 ```js
-import { Yield } from 'react-adone';
+import { createComponents } from 'react-adone';
 
-const counterBasket = {
-  // required and unique
-  key: 'counter',
+const { Subscriber } = createComponents({
   // value of the store on initialisation
   initialState = {
     count: 0,
   },
   // actions that trigger store mutation
   actions: {
-    increment: () => (setState, getState) => {
+    increment: (by = 1) => ({ setState, getState }) => {
       // mutate state syncronously
       setState({
-        count: getState().count + 1,
+        count: getState().count + by,
       });
     },
   },
-};
+  // optional, used for debugging
+  name: 'counter',
+})
+
 
 const App = () => (
-  <h1>My counter</h1>
-  <Yield from={counterBasket}>
-    {/* The basket actions and store state get spread for easy consumption */}
-    {({ count, increment }) => (
-      <div>
-        {count}
-        <button onClick={increment}>Add +1</button>
-      </div>
-    )}
-  </Yield>
+  <div>
+    <h1>My counter</h1>
+    <Subscriber>
+      {/* The basket actions and store state get spread for easy consumption */}
+      {({ count, increment }) => (
+        <div>
+          {count}
+          <button onClick={increment}>Add +1</button>
+        </div>
+      )}
+    </Subscriber>
+  </div>
 );
 ```

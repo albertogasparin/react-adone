@@ -9,8 +9,8 @@ import Composer from "react-composer";
 const UserProject = () => (
   <Composer
     components={[
-      <Yield from={userBasket} />,
-      <Yield from={projectBasket} />
+      <UserSubscriber />,
+      <ProjectSubscriber />
     ]}
   >
     {([user, project]) => (
