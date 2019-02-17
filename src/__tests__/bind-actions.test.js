@@ -33,6 +33,7 @@ describe('bindActions', () => {
           increase: expect.any(Function),
           decrease: expect.any(Function),
         }),
+        dispatch: expect.any(Function),
       },
       { url: '' }
     );

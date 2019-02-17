@@ -166,6 +166,7 @@ describe('Container', () => {
           getState: expect.any(Function),
           setState: expect.any(Function),
           actions: expect.any(Object),
+          dispatch: expect.any(Function),
         },
         { defaultCount: 5 }
       );
@@ -184,6 +185,7 @@ describe('Container', () => {
           getState: expect.any(Function),
           setState: expect.any(Function),
           actions: expect.any(Object),
+          dispatch: expect.any(Function),
         },
         { defaultCount: 6 }
       );
@@ -202,6 +204,7 @@ describe('Container', () => {
           getState: expect.any(Function),
           setState: expect.any(Function),
           actions: expect.any(Object),
+          dispatch: expect.any(Function),
         },
         { defaultCount: 5 }
       );
@@ -221,6 +224,7 @@ describe('Container', () => {
           getState: expect.any(Function),
           setState: expect.any(Function),
           actions: expect.any(Object),
+          dispatch: expect.any(Function),
         },
         { defaultCount: 6 }
       );

@@ -34,6 +34,7 @@ export type BasketAction<ST, PR = *, AC = *> = (
     setState: SetState<ST>,
     getState: GetState<ST>,
     actions: AC,
+    dispatch: (actionThunk: BasketAction<ST, PR, AC>) => *,
   |},
   containerProps: PR
 ) => *;

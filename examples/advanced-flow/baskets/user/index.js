@@ -3,10 +3,10 @@
 import { createComponents, createSelector } from 'react-adone';
 import type { State } from './types';
 
-import * as actionDefs from './actions';
+import * as actions from './actions';
 import * as selectors from './selectors';
 
-type Actions = typeof actionDefs;
+type Actions = typeof actions;
 type ContainerProps = {||};
 
 const initialState: State = {
@@ -20,8 +20,8 @@ export const {
   Subscriber: UserSubscriber,
 } = createComponents<State, Actions, ContainerProps>({
   initialState,
-  actions: actionDefs,
-  onContainerInit: () => ({ actions }) => actions.load(),
+  actions,
+  onContainerInit: actions.load,
 });
 
 export const UserSelectedSubscriber = createSelector<

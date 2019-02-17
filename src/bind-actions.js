@@ -17,15 +17,17 @@ export const bindAction = (
 ) => {
   // Setting mutator name so we can log action name for better debuggability
   const namedMutator = createNamedMutator(store, actionKey);
-  return (...args) =>
-    actionFn(...args)(
+  const dispatch = thunkFn =>
+    thunkFn(
       {
         setState: namedMutator,
         getState: store.getState,
         actions: otherActions,
+        dispatch,
       },
       getContainerProps()
     );
+  return (...args) => dispatch(actionFn(...args));
 };
 
 export const bindActions = (actions, store, getContainerProps = () => ({})) =>
