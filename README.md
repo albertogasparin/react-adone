@@ -14,7 +14,7 @@ Adone is heavily inspired by Redux, the main difference is the lack of reducers.
 
 `Yield` is responsible to get the instantiated basket store (using the `key` attribute) or creating a new one. That makes sharing baskets across you project extremely easy.
 
-Similar to Redux thunk, actions receive a `produce` function (read dispatcher) that gets called with mutator that receives a draft state that can either be modified directly or replaced by returning a new one.
+Similar to Redux thunk, actions receive a mutator function (the default is similar to React `setState`) that gets called with an object that will be shallow merged with the current state to provide a new, fresh state.
 
 ## Basic usage
 
@@ -28,21 +28,21 @@ yarn add react-adone
 
 ```js
 // baskets/counter.js
-const defaultState = {
+const initialState = {
   count: 0,
 };
 
 const actions = {
-  increment: () => produce => {
-    // produce() calls immer after passing through middlewares
-    // the mutation function should return undefined or the entire new state
-    produce(draft => {
-      draft.count += 1;
+  increment: () => ({ setState, getState }) => {
+    // setState() shallow merge the provider partial state going through middlewares
+    // unlike React setState, it is syncronous and accepts just objects
+    setState({
+      count: getState().count + 1,
     });
   },
 };
 
-export default { key: 'counter', defaultState, actions };
+export default { key: 'counter', initialState, actions };
 ```
 
 ```js

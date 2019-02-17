@@ -1,29 +1,33 @@
 // @flow
 
-import { createYield } from 'react-adone';
+import { createComponents, createSelector } from 'react-adone';
 import type { State } from './types';
 
-import * as actions from './actions';
+import * as actionDefs from './actions';
 import * as selectors from './selectors';
 
-const defaultState: State = {
+type Actions = typeof actionDefs;
+type ContainerProps = {||};
+
+const initialState: State = {
   selected: null,
   data: null,
   loading: false,
 };
 
-const basket = {
-  key: 'user',
-  defaultState,
-  actions,
-};
+export const {
+  Container: UserContainer,
+  Subscriber: UserSubscriber,
+} = createComponents<State, Actions, ContainerProps>({
+  initialState,
+  actions: actionDefs,
+  onContainerInit: () => ({ actions }) => actions.load(),
+});
 
-// You can even export ready-to-use components
-export const UserState = createYield('UserState', basket);
-export const UserSelectedState = createYield(
-  'UserSelectedState',
-  basket,
+export const UserSelectedSubscriber = createSelector<
+  $Call<typeof selectors.getSelected, State>,
+  Actions
+>(
+  UserSubscriber,
   selectors.getSelected
 );
-
-export default basket;

@@ -1,25 +1,45 @@
 // @flow
 
-import type { BasketAction } from 'react-adone';
+import { createComponents, type BasketAction } from 'react-adone';
 
 type State = {
   color: string,
 };
 
-const defaultState: State = {
-  color: '#FFF',
+type ContainerProps = {
+  defaultColor: string,
+};
+
+const initialState: State = {
+  color: '',
 };
 
 const actions = {
-  change: (value: string): BasketAction<State> => produce => {
-    produce(draft => {
-      draft.color = value;
+  change: (value?: string): BasketAction<State> => (
+    { setState },
+    { defaultColor }
+  ) => {
+    setState({
+      color: value || defaultColor,
     });
   },
 };
 
-export default {
-  key: 'theme',
-  defaultState,
+const {
+  Subscriber: ThemeSubscriber,
+  Container: ThemeContainer,
+} = createComponents<State, typeof actions, ContainerProps>({
+  name: 'theme',
+  initialState,
   actions,
-};
+  onContainerInit: () => ({ getState, actions: boundActions }) => {
+    // this gets currently called also when component remounts
+    // so it is important to check state status and apply default only on first mount
+    const { color } = getState();
+    if (!color) {
+      boundActions.change();
+    }
+  },
+});
+
+export { ThemeSubscriber, ThemeContainer };

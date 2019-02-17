@@ -1,8 +1,8 @@
 /* eslint-env jest */
 
 export const basketMock = {
-  key: 'basket-key',
-  defaultState: { count: 0 },
+  key: ['basket-key'],
+  initialState: { count: 0 },
   actions: {
     increase: jest.fn(),
     decrease: jest.fn(),
@@ -15,5 +15,5 @@ export const storeMock = {
   setState: jest.fn(),
   subscribe: jest.fn(),
   listeners: jest.fn(),
-  produce: jest.fn(),
+  mutator: jest.fn(),
 };

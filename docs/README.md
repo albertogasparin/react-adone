@@ -20,16 +20,16 @@ import { Yield } from 'react-adone';
 const counterBasket = {
   // required and unique
   key: 'counter',
-  // default value of the store on initialisation
-  defaultState = {
+  // value of the store on initialisation
+  initialState = {
     count: 0,
   },
   // actions that trigger store mutation
   actions: {
-    increment: () => produce => {
-      // mutate state directly thanks to immer.js
-      produce(draft => {
-        draft.count += 1;
+    increment: () => (setState, getState) => {
+      // mutate state syncronously
+      setState({
+        count: getState().count + 1,
       });
     },
   },

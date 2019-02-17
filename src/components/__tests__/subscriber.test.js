@@ -3,12 +3,12 @@
 import React, { Component } from 'react';
 import { shallow, mount } from 'enzyme';
 
-import { basketMock, storeMock } from './mocks';
-import Yield from '../yield';
-import YieldProvider from '../yield-provider';
-import { defaultRegistry } from '../registry';
+import { basketMock, storeMock } from '../../__tests__/mocks';
+import SubscriberComponent from '../subscriber';
+import AdoneProvider from '../provider';
+import { defaultRegistry } from '../../registry';
 
-jest.mock('../registry', () => {
+jest.mock('../../registry', () => {
   const mockRegistry = {
     configure: jest.fn(),
     getBasket: jest.fn(),
@@ -20,17 +20,21 @@ jest.mock('../registry', () => {
   };
 });
 
-describe('Yield', () => {
+let Subscriber;
+
+describe('Subscriber', () => {
   const children = jest.fn().mockReturnValue(null);
+  const actions = {
+    increase: expect.any(Function),
+    decrease: expect.any(Function),
+  };
 
   const modes = {
     withProvider: (props = {}) => {
       const getElement = () => (
-        <YieldProvider>
-          <Yield from={basketMock} {...props}>
-            {children}
-          </Yield>
-        </YieldProvider>
+        <AdoneProvider>
+          <Subscriber {...props}>{children}</Subscriber>
+        </AdoneProvider>
       );
       const getShallow = () =>
         shallow(getElement())
@@ -45,11 +49,7 @@ describe('Yield', () => {
       };
     },
     withoutProvider: (props = {}) => {
-      const getElement = () => (
-        <Yield from={basketMock} {...props}>
-          {children}
-        </Yield>
-      );
+      const getElement = () => <Subscriber {...props}>{children}</Subscriber>;
       const getShallow = () => shallow(getElement());
       const getMount = () => mount(getElement());
       return {
@@ -65,11 +65,13 @@ describe('Yield', () => {
     const setup = modes[key];
     describe(key, () => {
       beforeEach(() => {
+        Subscriber = class extends SubscriberComponent {};
+        Subscriber.basketType = basketMock;
         defaultRegistry.getBasket.mockReturnValue({
           store: storeMock,
           actions: basketMock.actions,
         });
-        storeMock.getState.mockReturnValue(basketMock.defaultState);
+        storeMock.getState.mockReturnValue(basketMock.initialState);
       });
 
       it('should get the basket instance from registry', () => {
@@ -94,25 +96,21 @@ describe('Yield', () => {
         const { getShallow, children } = setup();
         getShallow();
         expect(children).toHaveBeenCalledTimes(1);
-        expect(children).toHaveBeenCalledWith({
-          count: 0,
-          increase: expect.any(Function),
-          decrease: expect.any(Function),
-        });
+        expect(children).toHaveBeenCalledWith({ count: 0, ...actions });
       });
 
       it('should update when store calls update listener', () => {
-        const { getMount } = setup();
+        const { getMount, children } = setup();
         const instance = getMount().instance();
-        instance.setState = jest.fn();
         storeMock.getState.mockReturnValue({ count: 1 });
         instance.onUpdate();
-        expect(instance.setState).toHaveBeenCalledWith({ count: 1 });
+        expect(children).toHaveBeenCalledTimes(2);
+        expect(children).toHaveBeenCalledWith({ count: 1, ...actions });
       });
 
-      it('should avoid re-render children just rendered from parent update', () => {
+      it('should avoid re-render children when just rendered from parent update', () => {
         const { getElement, children } = setup();
-        class App extends Component<{}> {
+        class App extends Component {
           render() {
             return getElement();
           }
@@ -122,17 +120,13 @@ describe('Yield', () => {
         storeMock.getState.mockReturnValue({ count: 1 });
         wrapper.setProps({ foo: 1 });
         wrapper
-          .find(Yield)
+          .find(Subscriber)
           .instance()
           .onUpdate();
 
         expect(storeMock.getState).toHaveBeenCalledTimes(4);
         expect(children).toHaveBeenCalledTimes(2);
-        expect(children).toHaveBeenLastCalledWith({
-          count: 1,
-          increase: expect.any(Function),
-          decrease: expect.any(Function),
-        });
+        expect(children).toHaveBeenCalledWith({ count: 1, ...actions });
       });
 
       it('should remove listener from store on unmount', () => {
@@ -148,16 +142,37 @@ describe('Yield', () => {
         expect(unsubscribeMock).toHaveBeenCalled();
       });
 
-      it('should render children with pick return value', () => {
-        const pick = jest.fn().mockReturnValue({ foo: 1 });
-        const { getMount, children } = setup({ pick, withProps: { prop: 1 } });
+      it('should render children with selected return value', () => {
+        Subscriber.selector = jest.fn().mockReturnValue({ foo: 1 });
+        const { getMount, children } = setup({ prop: 1 });
         getMount();
-        expect(pick).toHaveBeenCalledWith(basketMock.defaultState, { prop: 1 });
-        expect(children).toHaveBeenCalledWith({
-          foo: 1,
-          increase: expect.any(Function),
-          decrease: expect.any(Function),
-        });
+        expect(Subscriber.selector).toHaveBeenCalledWith(
+          basketMock.initialState,
+          { prop: 1 }
+        );
+        expect(children).toHaveBeenCalledWith({ foo: 1, ...actions });
+        Subscriber.selector = undefined;
+      });
+
+      it('should not update on state change if selector output is equal', () => {
+        Subscriber.selector = jest.fn().mockReturnValue({ foo: 1 });
+        const { getMount, children } = setup({ prop: 1 });
+        const instance = getMount().instance();
+        instance.onUpdate();
+        expect(children).toHaveBeenCalledTimes(1);
+        // make sure memoisation works as expected
+        expect(Subscriber.selector).toHaveBeenCalledTimes(1);
+        Subscriber.selector = undefined;
+      });
+
+      it('should not update on state change if selector is null', () => {
+        Subscriber.selector = null;
+        const { getMount, children } = setup({ prop: 1 });
+        const instance = getMount().instance();
+        instance.onUpdate();
+        expect(children).toHaveBeenCalledTimes(1);
+        expect(children).toHaveBeenCalledWith({ ...actions });
+        Subscriber.selector = undefined;
       });
     });
   });

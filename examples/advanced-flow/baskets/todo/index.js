@@ -1,22 +1,25 @@
 // @flow
 
-import { createYield } from 'react-adone';
+import { createComponents } from 'react-adone';
 import type { State } from './types';
 
-import * as actions from './actions';
+import * as actionDefs from './actions';
 
-const defaultState: State = {
+type Actions = typeof actionDefs;
+type ContainerProps = {| selectedUser: string | null |};
+
+const initialState: State = {
   data: null,
   loading: false,
 };
 
-const basket = {
-  key: 'todo',
-  defaultState,
-  actions,
-};
-
-// You can even export ready-to-use components
-export const TodoState = createYield('TodoState', basket);
-
-export default basket;
+export const {
+  Container: TodoContainer,
+  Subscriber: TodoSubscriber,
+} = createComponents<State, Actions, ContainerProps>({
+  initialState,
+  actions: actionDefs,
+  onContainerUpdate: () => ({ actions }, { selectedUser }) => {
+    if (selectedUser) actions.load(selectedUser);
+  },
+});

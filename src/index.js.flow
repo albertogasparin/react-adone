@@ -9,30 +9,33 @@ import type { Node } from 'react';
  * AC: Basket actions
  */
 
-type Produce<ST> = (modifier: (ST) => ST | void) => void;
+type SetState<ST> = ($Shape<ST>) => void;
 type GetState<ST> = () => $ReadOnly<ST>;
 type BasketStoreUnsubscribe = () => void;
 
-type YieldRenderPropFunction<S, A> = ($Exact<$ReadOnly<S>> & $Exact<A>) => Node;
+type RenderPropComponent<S, A> = ($Exact<$ReadOnly<S>> & $Exact<A>) => Node;
 
 export type Basket<ST, AC> = {|
-  key: string,
-  defaultState: ST,
+  key: string[],
+  initialState: ST,
   actions: AC,
 |};
 
 export type BasketStore<ST> = {|
   getState: GetState<ST>,
   setState: ST => void,
-  key: string,
+  key: string[],
   subscribe: (listener: () => void) => BasketStoreUnsubscribe,
-  produce: Produce<ST>,
+  mutator: SetState<ST>,
 |};
 
-export type BasketAction<ST, EX = *> = (
-  produce: Produce<ST>,
-  getState: GetState<ST>,
-  extraArg: EX
+export type BasketAction<ST, PR = *, AC = *> = (
+  {|
+    setState: SetState<ST>,
+    getState: GetState<ST>,
+    actions: AC,
+  |},
+  containerProps: PR
 ) => *;
 
 export type BasketInstance<ST, AC> = {
@@ -42,8 +45,7 @@ export type BasketInstance<ST, AC> = {
 
 declare export class Registry {
   configure: ({
-    initialStates: { [key: string]: Object },
-    actionExtraArgument: any,
+    initialStates?: { [key: string]: Object },
   }) => void;
   baskets: Map<string, BasketInstance<any, any>>;
   initBasket: <ST, AC>(key: string, Basket<ST, AC>) => BasketInstance<ST, AC>;
@@ -56,51 +58,9 @@ declare export class Registry {
 
 declare export var defaultRegistry: Registry;
 
-declare export class Yield<ST, AC, PI> extends React$Component<
-  | {|
-      children: YieldRenderPropFunction<ST, AC>,
-      from: Basket<ST, AC>,
-      withProps?: {},
-    |}
-  | {|
-      children: YieldRenderPropFunction<PI, AC>,
-      from: Basket<ST, AC>,
-      pick: ST => PI,
-      withProps?: {},
-    |}
-  | {|
-      children: YieldRenderPropFunction<{||}, AC>,
-      from: Basket<ST, AC>,
-      pick: null,
-      withProps?: {},
-    |}
-> {
-  basket: BasketInstance<ST, AC>;
-}
-
-declare export class YieldScope extends React$Component<
-  | {
-      id: string,
-      for: Basket<*, *> | Basket<*, *>[],
-      local?: false,
-    }
-  | {
-      id?: string,
-      for: Basket<*, *> | Basket<*, *>[],
-      local: true,
-    },
+declare export class AdoneProvider extends React$Component<
   {
-    globalRegistry: Registry,
-    getBasket: $PropertyType<Registry, 'getBasket'>,
-  }
-> {
-  registry: Registry;
-}
-
-declare export class YieldProvider extends React$Component<
-  {
-    initialStates?: {},
-    actionExtraArgument?: any,
+    initialStates?: { [key: string]: Object },
   },
   {
     globalRegistry: Registry,
@@ -110,7 +70,7 @@ declare export class YieldProvider extends React$Component<
   registry: Registry;
 }
 
-type MiddlewareResult = { changes: any[] };
+type MiddlewareResult = any;
 export type Middleware = (
   store: BasketStore<any>
 ) => (next: (fn: any) => MiddlewareResult) => (fn: () => *) => MiddlewareResult;
@@ -118,35 +78,30 @@ export type Middleware = (
 declare export var defaults: {
   devtools: boolean,
   middlewares: Set<Middleware>,
+  mutator: <ST>(prevState: ST, partialState: $Shape<ST>) => ST,
 };
 
-declare export function createYield<ST, AC>(
-  from: Basket<ST, AC>
-): React$ComponentType<{ children: YieldRenderPropFunction<ST, AC> }>;
+declare export function createComponents<ST, AC, PR>({
+  initialState: ST,
+  actions: AC,
+  name?: string,
+  onContainerInit?: () => BasketAction<ST, PR, AC>,
+  onContainerUpdate?: () => BasketAction<ST, PR, AC>,
+}): {
+  Container: React$ComponentType<{ scope?: string, isGlobal?: boolean, ...PR }>,
+  Subscriber: React$ComponentType<{
+    children: RenderPropComponent<ST, AC>,
+  }>,
+};
 
-declare export function createYield<ST, AC>(
-  name: string,
-  from: Basket<ST, AC>
-): React$ComponentType<{ children: YieldRenderPropFunction<ST, AC> }>;
+declare export function createSelector<SE, AC>(
+  Subscriber: React$ComponentType<any>,
+  selector: (state: any) => SE,
+  displayName?: string
+): React$ComponentType<{ children: RenderPropComponent<SE, AC> }>;
 
-declare export function createYield<ST, AC, PI>(
-  from: Basket<ST, AC>,
-  pick: (ST) => PI
-): React$ComponentType<{ children: YieldRenderPropFunction<PI, AC> }>;
-
-declare export function createYield<ST, AC, PI>(
-  from: Basket<ST, AC>,
-  pick: null
-): React$ComponentType<{ children: YieldRenderPropFunction<{||}, AC> }>;
-
-declare export function createYield<ST, AC, PI>(
-  name: string,
-  from: Basket<ST, AC>,
-  pick: (ST) => PI
-): React$ComponentType<{ children: YieldRenderPropFunction<PI, AC> }>;
-
-declare export function createYield<ST, AC, PI>(
-  name: string,
-  from: Basket<ST, AC>,
-  pick: null
-): React$ComponentType<{ children: YieldRenderPropFunction<{||}, AC> }>;
+declare export function createSelector<AC>(
+  Subscriber: React$ComponentType<any>,
+  selector: null,
+  displayName?: string
+): React$ComponentType<{ children: RenderPropComponent<{}, AC> }>;

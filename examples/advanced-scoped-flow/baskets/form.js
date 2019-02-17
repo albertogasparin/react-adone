@@ -1,44 +1,55 @@
 // @flow
 
-import type { BasketAction } from 'react-adone';
+import { createComponents, type BasketAction } from 'react-adone';
 
 type State = {
   message: string,
   isValid: boolean,
   isSending: boolean,
+  toUsers: number,
 };
 
-const defaultState: State = {
+type ContainerProps = {
+  remoteUsers: number,
+};
+
+const initialState: State = {
   message: '',
   isValid: false,
   isSending: false,
+  toUsers: 0,
 };
 
 const actions = {
-  input: (value: string): BasketAction<State> => produce => {
-    produce(draft => {
-      draft.message = value;
-      draft.isValid = value.length > 0;
+  input: (value: string): BasketAction<State> => ({ setState }) => {
+    setState({
+      message: value,
+      isValid: value.length > 0,
     });
   },
 
-  send: (message: string): BasketAction<State> => async produce => {
-    produce(draft => {
-      draft.isSending = true;
+  send: (message: string): BasketAction<State> => async ({ setState }) => {
+    setState({
+      isSending: true,
     });
     await new Promise(r => setTimeout(r, 1000));
-    produce(draft => {
-      draft.isSending = false;
-      draft.message = '';
+    setState({
+      isSending: false,
+      message: '',
     });
     return message;
   },
 };
 
-const basket = {
-  key: 'form',
-  defaultState,
+const {
+  Subscriber: FormSubscriber,
+  Container: FormContainer,
+} = createComponents<State, typeof actions, ContainerProps>({
+  name: 'form',
+  initialState,
   actions,
-};
-
-export default basket;
+  onContainerUpdate: () => ({ setState }, { remoteUsers }) => {
+    setState({ toUsers: remoteUsers });
+  },
+});
+export { FormSubscriber, FormContainer };
