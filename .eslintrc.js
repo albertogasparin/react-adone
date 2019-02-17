@@ -23,6 +23,7 @@ module.exports = {
   },
   plugins: ['react', 'flowtype', 'import'],
   rules: {
+    'no-shadow': ['error'],
     indent: ['off'],
     'linebreak-style': ['off'],
     quotes: ['off'],

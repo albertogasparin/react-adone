@@ -23,7 +23,6 @@ jest.mock('../../registry', () => {
 let Subscriber;
 
 describe('Subscriber', () => {
-  const children = jest.fn().mockReturnValue(null);
   const actions = {
     increase: expect.any(Function),
     decrease: expect.any(Function),
@@ -31,6 +30,7 @@ describe('Subscriber', () => {
 
   const modes = {
     withProvider: (props = {}) => {
+      const children = jest.fn().mockReturnValue(null);
       const getElement = () => (
         <AdoneProvider>
           <Subscriber {...props}>{children}</Subscriber>
@@ -49,6 +49,7 @@ describe('Subscriber', () => {
       };
     },
     withoutProvider: (props = {}) => {
+      const children = jest.fn().mockReturnValue(null);
       const getElement = () => <Subscriber {...props}>{children}</Subscriber>;
       const getShallow = () => shallow(getElement());
       const getMount = () => mount(getElement());
