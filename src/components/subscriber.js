@@ -102,14 +102,15 @@ export default class Subscriber extends Component {
     }
   }
 
-  onUpdate = basketState => {
+  onUpdate = () => {
     // Ensure component is still mounted and has a basket attached
     if (!this.basket) return;
     const prevBasketState = this.state.basketState;
-    const nextBasketState = basketState || this.getBasketState();
+    const nextBasketState = this.getBasketState();
     // Only update if state changed
     // just check simple equality as shallow check done by memoized selector
     if (prevBasketState !== nextBasketState) {
+      // nextState will recalculated by gDSFP anyway
       this.setState({ basketState: nextBasketState });
     }
   };
