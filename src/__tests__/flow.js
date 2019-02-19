@@ -96,7 +96,7 @@ Test = <TypeSubscriber>{(__, { increment }) => increment(1)}</TypeSubscriber>;
 /**
  * createSubscriber with selector types tests
  */
-TypeSelector = createSubscriber<*, *, _>(TypeStore, {
+TypeSelector = createSubscriber<*, *, _, void>(TypeStore, {
   selector: state => ({ baz: 1 }),
 });
 

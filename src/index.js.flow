@@ -13,7 +13,7 @@ type SetState<ST> = ($Shape<ST>) => void;
 type GetState<ST> = () => $ReadOnly<ST>;
 type StoreUnsubscribe = () => void;
 
-type RenderPropComponent<S, A> = ($Exact<$ReadOnly<S>>, $Exact<A>) => Node;
+type RenderPropComponent<S, A> = ($ReadOnly<S>, $Exact<A>) => Node;
 
 export type Store<ST, AC> = {|
   key: string[],
@@ -91,11 +91,11 @@ type SubscriberComponent<ST, AC, PR> = React$ComponentType<{|
   ...PR,
 |}>;
 
-declare export function createStore<ST, AC>({
+declare export function createStore<ST, AC>({|
   initialState: ST,
   actions: AC,
   name?: string,
-}): Store<ST, AC>;
+|}): Store<ST, AC>;
 
 declare export function createContainer<ST, AC, PR>(
   store: Store<ST, AC>,
@@ -113,7 +113,7 @@ declare export function createSubscriber<ST, AC>(
   |}
 ): SubscriberComponent<ST, AC, {||}>;
 
-// does not work as Flow complains cannot select between null and fn()
+// Does not work as Flow complains cannot select between null and fn()
 // declare export function createSubscriber<ST, AC>(
 //   store: Store<ST, AC>,
 //   options: {|
@@ -122,18 +122,19 @@ declare export function createSubscriber<ST, AC>(
 //   |}
 // ): SubscriberComponent<{||}, AC, {||}>;
 
-declare export function createSubscriber<ST, AC, SE>(
-  store: Store<ST, AC>,
-  options: {|
-    selector: null | ((state: ST) => SE),
-    displayName?: string,
-  |}
-): SubscriberComponent<SE, AC, {||}>;
+// Old Flow not able to refine between with/without selector props
+// declare export function createSubscriber<ST, AC, SE>(
+//   store: Store<ST, AC>,
+//   options: {|
+//     selector: (state: ST) => SE,
+//     displayName?: string,
+//   |}
+// ): SubscriberComponent<SE, AC, {||}>;
 
 declare export function createSubscriber<ST, AC, SE, PR>(
   store: Store<ST, AC>,
   options: {|
-    selector: (state: ST, props: PR) => SE,
+    selector: null | ((state: ST, props: PR) => SE),
     displayName?: string,
   |}
 ): SubscriberComponent<SE, AC, PR>;

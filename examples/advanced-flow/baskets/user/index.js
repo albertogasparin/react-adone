@@ -27,9 +27,11 @@ export const UserContainer = createContainer<*, *, ContainerProps>(Store, {
 
 export const UserSubscriber = createSubscriber<*, *>(Store);
 
-export const UserSelectedSubscriber = createSubscriber<*, *, UserSelectedState>(
-  Store,
-  {
-    selector: selectors.getSelected,
-  }
-);
+export const UserSelectedSubscriber = createSubscriber<
+  *,
+  *,
+  UserSelectedState,
+  void
+>(Store, {
+  selector: selectors.getSelected,
+});
