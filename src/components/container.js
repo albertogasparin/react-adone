@@ -18,15 +18,16 @@ export default class Container extends Component {
 
   static getDerivedStateFromProps(nextProps, prevState) {
     const { scope } = nextProps;
-    const isInitialized =
-      scope === prevState.scope && prevState.scopedBasketActions;
+    const hasScopeChanged = scope !== prevState.scope;
 
     let nextState = null;
-    if (!isInitialized) {
+    if (hasScopeChanged) {
       const actions = prevState.bindContainerActions(scope);
       nextState = { scope, scopedBasketActions: actions };
     }
     // We trigger the action here so subscribers get new values ASAP
+    // onInit this is called twice (contructor and here) to support React<16.5
+    // but the state update is triggered only once as shallowEq will stop it
     prevState.triggerContainerAction(nextProps);
     return nextState;
   }
@@ -46,9 +47,13 @@ export default class Container extends Component {
       // as js context there is null https://github.com/facebook/react/issues/12612
       bindContainerActions: this.bindContainerActions,
       triggerContainerAction: this.triggerContainerAction,
-      scope: null,
-      scopedBasketActions: null,
+      scope: props.scope,
     };
+
+    // this is needed for compat with React<16.5
+    // as gDSFP in not called before first render
+    this.state.scopedBasketActions = this.bindContainerActions(props.scope);
+    this.triggerContainerAction(props);
   }
 
   componentDidUpdate(prevProps) {

@@ -116,6 +116,11 @@ export default class Subscriber extends Component {
   };
 
   render() {
-    return this.props.children(this.state.basketState, this.basket.actions);
+    // this is needed for compat with React<16.5
+    // as gDSFP in not called before first render
+    const basketState = this.basket
+      ? this.state.basketState
+      : this.getBasketState(this.props, true);
+    return this.props.children(basketState, this.basket.actions);
   }
 }
