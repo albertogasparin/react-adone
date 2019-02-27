@@ -1,7 +1,7 @@
 /* eslint-env jest */
 
 import { StoreMock } from '../../__tests__/mocks';
-import StoreRegistry from '../registry';
+import { StoreRegistry } from '../registry';
 
 describe('StoreRegistry', () => {
   it('should get and create a new store', () => {

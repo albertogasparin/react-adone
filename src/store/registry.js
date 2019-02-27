@@ -3,7 +3,7 @@ import createStoreState from './create-state';
 
 export const GLOBAL_SCOPE = '__global__';
 
-export default class StoreRegistry {
+export class StoreRegistry {
   stores = new Map();
   initialStates = {};
 

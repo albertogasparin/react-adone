@@ -4,10 +4,7 @@ import React from 'react';
 import { shallow, mount } from 'enzyme';
 
 import { StoreMock, storeStateMock } from '../../__tests__/mocks';
-import StoreRegistry, {
-  defaultRegistry,
-  default as registryDefaultExport,
-} from '../../store/registry';
+import { defaultRegistry, StoreRegistry } from '../../store/registry';
 import { createStore } from '../../store';
 import { createContainer, createSubscriber } from '../creators';
 
@@ -19,7 +16,7 @@ const mockRegistry = {
 
 jest.mock('../../store/registry', () => ({
   __esModule: true,
-  default: jest.fn(),
+  StoreRegistry: jest.fn(),
   defaultRegistry: {
     configure: jest.fn(),
     getStore: jest.fn(),
@@ -45,7 +42,7 @@ describe('Container', () => {
       actions: StoreMock.actions,
     };
     defaultRegistry.getStore.mockReturnValue(getStoreReturn);
-    registryDefaultExport.mockImplementation(() => mockRegistry);
+    StoreRegistry.mockImplementation(() => mockRegistry);
     mockRegistry.getStore.mockReturnValue(getStoreReturn);
     storeStateMock.getState.mockReturnValue(StoreMock.initialState);
   });
