@@ -4,20 +4,29 @@
 
 - **Basics**
 
-  - [Creating components](./basics/create.md)
+  - [Store](./basics/store.md)
   - [Actions](./basics/actions.md)
-  - [Using subscribers](./basics/subscriber.md)
-  - [Using container](./basics/container.md)
-  - [Provider or provider-less](./basics/yield-provider.md)
+  - [Subscribers](./basics/subscriber.md)
+  - [Hooks](./basics/hook.md)
 
 - **Advanced**
 
+  - [Actions patters](./advanced/actions.md)
   - [Selectors](./advanced/selector.md)
-  - [Container scopes](./advanced/container-scope.md)
+  - [Containers](./advanced/container.md)
+  - [Provider](./advanced/provider.md)
   - [Devtools](./advanced/devtools.md)
   - [State rehydration](./advanced/rehydration.md)
   - [Middlewares](./advanced/middlewares.md)
 
-- **Recipes**
+- **APIs**
+
+  - [Actions](./api/actions.md)
+  - [Containers](./api/container.md)
+  - [Hooks](./api/hook.md)
+  - [Store](./api/store.md)
+  - [Subscribers](./api/subscriber.md)
+
+* **Recipes**
 
   - [Composition](recipes/composition.md)

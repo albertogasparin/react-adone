@@ -1,86 +1,140 @@
-## Creating selector components
+## Creating Subscribers/hooks with selectors
 
-Adone allows you to create components that return a specific (or manipulated) part of the state, and they recompute only when state (or props) change.
+Adone allows you to create Subscribers and hooks that return a specific (or manipulated) part of the state, and they re-render only if the output is not shallow equal. Creating such components is extremely easy as you only need to specify the `selector` function in the creator option object:
 
 ```js
-// todos-count.js
-import { createSelectorComponent } from 'react-adone';
-import { TodoSubscriber } from './components/todo';
+import { createStore, createSubscriber, createHook } from 'react-adone';
 
-const getTodosCount = state => ({ todosCount: state.todos.length }),
+const Store = createStore({
+  initialState: {
+    currentUserId: null,
+    users: [],
+  },
+  actions: {
+    // fetch users, set currentUserId, ecc...
+  },
+});
 
-const TodoCountSubscriber = createSelectorComponent(
-  TodoSubscriber, // subscriber to create selector from
-  getTodosCount,  // selector function
-  'TodoCountSubscriber' // optional selector component name
-)
+const getCurrentUser = state =>
+  state.users.find(user => user.id === state.currentUserId);
 
-export const TodosCount = () => (
-  <TodoCountSubscriber>
-    {/* render prop is called only on todosCount change */}
-    {({ todosCount }) => <p>You have {todosCount} todos</p>}
-  </TodoCountSubscriber>
-);
+export const CurrentUserSubscriber = createSubscriber(Store, {
+  selector: getCurrentUser,
+});
+
+export const useCurrentUser = createHook(Store, {
+  selector: getCurrentUser,
+});
 ```
 
-If you want to pass props to the selector, just add props to the selector subscriber and they will be the second argument of the selector:
+As long as the user returned by `find` is shallow equal to the previews one, `CurrentUserSubscriber` will not re-render it's children.
+
+#### Selectors with props
+
+The `selector` also receives a second argument, `props`, that are the custom props passed to the selector subscriber:
 
 ```js
-// button-increment.js
-import { createSelectorComponent } from 'react-adone';
-import { TodoSubscriber } from './components/todo';
+import { createStore, createSubscriber, createHook } from 'react-adone';
+
+const Store = createStore({
+  initialState: { todos: [] },
+  actions: {
+    // fetch todos, ecc...
+  },
+});
 
 const getTodosByStatus = (state, props) => ({ todos: state.todos.filter(t => t.status === props.status) });
 
-const TodosSubscriber = createSelectorComponent(TodoSubscriber, getTodosCount)
+export const TodosByStatusSubscriber = createSubscriber(Store, {
+  selector: getTodosByStatus,
+});
+
+export const useTodosByStatus = createHook(Store, {
+  selector: getTodosByStatus,
+});
 
 export const TodoList = ({ status }) => (
-  <TodosSubscriber status={status}>
+  <TodosByStatusSubscriber status={status}>
     {({ todos }) => /* render... */}
-  </Yield>
+  </TodosByStatusSubscriber>
 );
+// or
+export const TodoList = ({ status }) => {
+  const [state, actions] = useTodosByStatus({ status });
+  return todos.map(/* render... */);
+}
 ```
 
-A useful value for the selector is `null`: when so, `Subscriber` will not re-render on any store state change
+#### Stateless selectors
+
+A useful value for the `selector` option is `null`: when so, `Subscriber` will not re-render on any store state change
 (but will if parent re-renders, as Adone is **not** using `PureComponent` nor `shouldComponentUpdate`).
 So `null` is useful when children just have to trigger actions:
 
 ```js
-// button-increment.js
-import { createSelectorComponent } from 'react-adone';
-import { CounterSubscriber } from './components/counter';
+import { createStore, createSubscriber, createHook } from 'react-adone';
 
-const CounterActions = createSelectorComponent(
-  CounterSubscriber,
-  null,
-  'CounterActions'
-);
+const Store = createStore({
+  initialState: { todos: [] },
+  actions: {
+    refetch: () => async ({ setState }) => {
+      /* etc... */
+    },
+  },
+});
 
-export const ButtonIncrement = () => (
-  <CounterActions>
-    {({ actions }) => <button onClick={actions.increment}>+</button>}
-  </CounterActions>
+export const TodosActions = createSubscriber(Store, {
+  selector: null,
+});
+
+export const useTodosActions = createHook(Store, {
+  selector: null,
+});
+
+export const RefetchButton = () => (
+  <TodosActions>
+    {(__, { actions }) => <button onClick={actions.refetch}>Refetch</button>}
+  </TodosActions>
 );
+// or
+export const RefetchButton = () => {
+  const [, actions] = useTodosActions();
+  return (
+    <button onClick={actions.refetch}>Refetch</button>
+  )
+}
 ```
 
-#### createSelectorComponent and createSelector
+#### Adding reselect to memoize selectors
 
-In case you want to re-render your component only when a specific part of the state changes, you can enhance your selector with [reselect](https://github.com/reduxjs/reselect) `createSelector`
+In case `selector` is expensive or returns complex mutated data every single time it is executed, it can be enhanced with [reselect](https://github.com/reduxjs/reselect) `createSelector`. By doing so, you ensure it gets recomputed only when relevant parts of state/props change:
 
 ```js
+import { createStore, createSubscriber, createHook } from 'react-adone';
 import { createSelector } from 'reselect';
-import { TodoSubscriber } from './components/todo';
+
+const Store = createStore({
+  initialState: { todos: [], loading: false, error: null },
+  actions: {
+    // fetch todos, ecc...
+  },
+});
 
 const getFilteredTodos = createSelector(
   state => state.data.todos,
   state => state.statusFilter,
-  (todos, status) => todos.filter(t => t.status === status)
+  (todos, status) => ({ todos: todos.filter(t => t.status === status) })
 );
 
-const FilteredTodosSubscriber = createSelectorComponent(
-  TodoSubscriber,
-  getFilteredTodos
+export const TodosFilteredSubscriber = createSubscriber(Store, {
+  selector: getFilteredTodos,
+});
+
+export const TodoList = ({ status }) => (
+  <TodosFilteredSubscriber status={status}>
+    {({ todos }) => /* render... */}
+  </TodosFilteredSubscriber>
 );
 ```
 
-With the above code, if other attributes on the state do change (eg: `state.loading`), `FilteredTodosSubscriber` will not re-render
+In example above, if other attributes of the state change (eg: `loading`), `TodosFilteredSubscriber` will not re-render.

@@ -1,7 +1,6 @@
 ## Basics
 
-- [Creating components](./basics/create.md)
+- [Store](./basics/store.md)
 - [Actions](./basics/actions.md)
-- [Using subscribers](./basics/subscriber.md)
-- [Using container](./basics/container.md)
-- [Provider or provider-less](./basics/yield-provider.md)
+- [Subscribers](./basics/subscriber.md)
+- [Hooks](./basics/hook.md)

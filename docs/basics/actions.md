@@ -1,72 +1,42 @@
 ## Store actions
 
-In order to modify data in a store you can define actions.
+Actions are functions that can mutate data in a Store.
 
 ```js
 const actions = {
-  doSomething: (...args) => (
-    { setState, getState, actions, dispatch },
-    containerProps
-  ) => {
-    // your code here
+  reset: () => ({ setState }) => {
+      setState({ count: 0 });
+    };
   },
 };
 ```
 
-Actions are function that return another function. This "inner function" (called thunk) will be called by Adone with two arguments. The first one is an object with:
+Actions are functions that return another function. While you will responsible to call the "outer" function with the arguments that you please, the "inner" function (called thunk) is automatically called by Adone itself right after the "outer" one, with two arguments. The first one is an object with `setState`, `getState`, `actions`, `dispatch` while the second argument is an object containing the custom props defined on the `Container` [component type](../advanced/container.md).
 
-##### - setState
-
-It is the method responsible for triggering actual updates to the store. The default is a syncronous version of React `setState`, supporting only an object as argument (shallow merged into current state). See React guidelines for do's and dont's around setState for more around the limitations of shallow merge.
-
-```js
-// inside your action
-setState({ count: 0 });
-```
-
-You can replace this default implementation with a custom one, for instance with [immer](https://github.com/mweststrate/immer), by overriding `defaults.mutator`.
-
-##### - `getState`
-
-This method returns a fresh state every time you call it. You should use it instead of caching the state inside the action, as it might become stale.
-
-```js
-// inside your action
-if (getState().loading) {
-  /* ... */
-}
-```
-
-##### - `actions`
-
-This object contains all the actions you have defined for this store, ready to be called.
-
-##### - `dispatch`
-
-This method allows you to trigger other actions:
-
-```js
-// inside your action
-dispatch(actions.increment(2));
-```
-
-### Async actions
-
-Like [redux-thunk](https://github.com/reduxjs/redux-thunk), store actions can be async and you can call `setState` as many time as you need. Please note that changes to the state are applied immediately, so you should always use `getState` to query for a value. If you cache in a variable the result of `getState` you might accidentally use stale data.
+Assuming you want a function that increments the counter by a custom value, you can get current count value and add the provided number to it:
 
 ```js
 const actions = {
-  load: () => async ({ setState, getState }, { api }) => {
-    if (getState().loading === true) return;
-    setState({
-      loading: true,
-    });
-
-    const todos = await api.get('/todos');
-    setState({
-      loading: false,
-      data: todos,
-    });
+  increment: (number) => ({ setState, getState }) => {
+      const currentCount = getState().count;
+      setState({ count: currentCount + number });
+    };
   },
 };
 ```
+
+Then all you have to do is call that function, exposed via a `Subscriber` from your view:
+
+```js
+import { CounterSubscriber } from './components/counter';
+
+const App = () => (
+  <CounterSubscriber>
+    {(state, actions) => (
+      <button onClick={() => actions.increment(2)}>Add two</button>
+    )}
+  </CounterSubscriber>
+);
+```
+
+For more details about actions see the full [actions API](../api/actions.md) or how to define [advanced action patters](../advanced/actions.md), like async actions.

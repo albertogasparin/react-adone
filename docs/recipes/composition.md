@@ -13,9 +13,9 @@ const UserProject = () => (
       <ProjectSubscriber />
     ]}
   >
-    {([user, project]) => (
-      /* here you can have a component that triggers user.load()
-         and when user data is returned calls project.load(user.data.id) */
+    {([[userState, userActions], [projectState, projectActions]]) => (
+      /* here you can have a component that triggers userActions.load()
+         and when user data is returned calls projectActions.load(userState.data.id) */
     )}
   </Composer>
 );

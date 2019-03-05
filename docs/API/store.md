@@ -1,0 +1,3 @@
+## Store API
+
+### createStore

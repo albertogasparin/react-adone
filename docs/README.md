@@ -42,10 +42,11 @@ const App = () => (
     <h1>My counter</h1>
     <CounterSubscriber>
       {/* Store state is the first argument and actions are the second one */}
-      {({ count }, { increment }) => (
+      {(state, actions) => (
         <div>
-          {count}
-          <button onClick={increment}>Add +1</button>
+          {state.count}
+          <button onClick={actions.increment}>Add +1</button>
+          <button onClick={() => actions.increment(2)}>Add +2</button>
         </div>
       )}
     </CounterSubscriber>
