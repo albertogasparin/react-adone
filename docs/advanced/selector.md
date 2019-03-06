@@ -27,7 +27,7 @@ export const useCurrentUser = createHook(Store, {
 });
 ```
 
-As long as the user returned by `find` is shallow equal to the previews one, `CurrentUserSubscriber` will not re-render it's children.
+As long as the user returned by `find` is shallow equal to the previews one, `CurrentUserSubscriber` will not re-render it's children, but the selector will still be executed every time the state is mutated. If you need the selector to selectively recompute see the chapter about reselect.
 
 #### Selectors with props
 

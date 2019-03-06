@@ -138,8 +138,20 @@ describe('Hook', () => {
     expect(children).toHaveBeenLastCalledWith({ foo: 2 }, actions);
   });
 
-  it('should not update on state change if selector output is equal', () => {
-    const selector = jest.fn().mockReturnValue({ foo: 1 });
+  it('should update on state change if selector output is not shallow equal', () => {
+    const selector = jest.fn().mockImplementation(() => ({ foo: [1] }));
+    const { getMount, children } = setup({}, selector);
+    getMount();
+    const newState = { count: 1 };
+    storeStateMock.getState.mockReturnValue(newState);
+    const update = storeStateMock.subscribe.mock.calls[0][0];
+    act(() => update(newState));
+
+    expect(children).toHaveBeenCalledTimes(2);
+  });
+
+  it('should not update on state change if selector output is shallow equal', () => {
+    const selector = jest.fn().mockImplementation(() => ({ foo: 1 }));
     const { getMount, children } = setup({}, selector);
     getMount();
     const newState = { count: 1 };
@@ -148,8 +160,18 @@ describe('Hook', () => {
     act(() => update(newState));
 
     expect(children).toHaveBeenCalledTimes(1);
-    // check that on state change memoisation breaks
+    // ensure that on state change memoisation breaks
     expect(selector).toHaveBeenCalledTimes(2);
+  });
+
+  it('should not recompute selector if state & props are equal', () => {
+    const selector = jest.fn().mockReturnValue({ foo: 1 });
+    const { getMount } = setup({ bar: 1 }, selector);
+    const wrapper = getMount();
+    wrapper.setProps({ bar: 1 });
+
+    // ensure memoisation works
+    expect(selector).toHaveBeenCalledTimes(1);
   });
 
   it('should not update on state change if selector is null', () => {
@@ -163,6 +185,6 @@ describe('Hook', () => {
     act(() => update(newState));
 
     expect(children).toHaveBeenCalledTimes(1);
-    expect(children).toHaveBeenCalledWith({}, actions);
+    expect(children).toHaveBeenCalledWith(undefined, actions);
   });
 });

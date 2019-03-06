@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 
 import { readContext } from '../context';
 import memoize from '../utils/memoize';
+import shallowEqual from '../utils/shallow-equal';
 
 export default class Subscriber extends Component {
   static propTypes = {
@@ -10,18 +11,14 @@ export default class Subscriber extends Component {
   };
 
   static storeType = null;
-  static selector = state => state;
+  static selector;
 
   static getDerivedStateFromProps(nextProps, prevState) {
     // Get fresh state at every re-render, so if a parent triggers
     // a re-render before the component subscription calls onUpdate()
     // we already serve the updated state and skip the additional render
     const nextStoreStateValue = prevState.getStoreStateValue(nextProps, true);
-    // just check simple equality as shallow check done by memoized selector
-    if (prevState.storeStateValue !== nextStoreStateValue) {
-      return { storeStateValue: nextStoreStateValue };
-    }
-    return null;
+    return { storeStateValue: nextStoreStateValue };
   }
 
   store = null;
@@ -31,7 +28,7 @@ export default class Subscriber extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      storeStateValue: {},
+      storeStateValue: undefined,
       // stored to make them available in getDerivedStateFromProps
       // as js context there is null https://github.com/facebook/react/issues/12612
       getStoreStateValue: this.getStoreStateValue,
@@ -74,7 +71,9 @@ export default class Subscriber extends Component {
     const currentStoreState = this.store.storeState.getState();
     return this.selector
       ? this.selector(currentStoreState, props)
-      : this.state.storeStateValue;
+      : this.selector === null
+      ? undefined
+      : currentStoreState;
   };
 
   getStoreFromContext() {
@@ -106,8 +105,7 @@ export default class Subscriber extends Component {
     const prevStoreStateValue = this.state.storeStateValue;
     const nextStoreStateValue = this.getStoreStateValue();
     // Only update if state changed
-    // just check simple equality as shallow check done by memoized selector
-    if (prevStoreStateValue !== nextStoreStateValue) {
+    if (!shallowEqual(prevStoreStateValue, nextStoreStateValue)) {
       // nextState will recalculated by gDSFP anyway
       this.setState({ storeStateValue: nextStoreStateValue });
     }

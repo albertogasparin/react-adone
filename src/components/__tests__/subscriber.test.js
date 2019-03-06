@@ -37,11 +37,16 @@ describe('Subscriber', () => {
           <Subscriber {...props}>{children}</Subscriber>
         </AdoneProvider>
       );
-      const getShallow = () =>
-        shallow(getElement())
+      const getShallow = () => {
+        const component = shallow(getElement())
           .childAt(0)
           .shallow();
-      const getMount = () => mount(getElement()).childAt(0);
+        return { component, instance: component.instance() };
+      };
+      const getMount = () => {
+        const component = mount(getElement()).childAt(0);
+        return { component, instance: component.instance() };
+      };
       return {
         getElement,
         getShallow,
@@ -52,8 +57,14 @@ describe('Subscriber', () => {
     withoutProvider: (props = {}) => {
       const children = jest.fn().mockReturnValue(null);
       const getElement = () => <Subscriber {...props}>{children}</Subscriber>;
-      const getShallow = () => shallow(getElement());
-      const getMount = () => mount(getElement());
+      const getShallow = () => {
+        const component = shallow(getElement());
+        return { component, instance: component.instance() };
+      };
+      const getMount = () => {
+        const component = mount(getElement());
+        return { component, instance: component.instance() };
+      };
       return {
         getElement,
         getShallow,
@@ -86,7 +97,7 @@ describe('Subscriber', () => {
 
       it('should save store instance locally and listen', () => {
         const { getShallow } = setup();
-        const instance = getShallow().instance();
+        const { instance } = getShallow();
         expect(instance.store).toEqual({
           storeState: storeStateMock,
           actions: expect.any(Object),
@@ -107,7 +118,7 @@ describe('Subscriber', () => {
         const { getMount, children } = setup();
         storeStateMock.getState.mockReturnValueOnce({ count: 1 });
         storeStateMock.getState.mockReturnValue({ count: 2 });
-        getMount().instance();
+        getMount();
         expect(children).toHaveBeenCalledTimes(2);
         expect(children).toHaveBeenCalledWith({ count: 1 }, actions);
         expect(children).toHaveBeenLastCalledWith({ count: 2 }, actions);
@@ -116,7 +127,7 @@ describe('Subscriber', () => {
       it('should update when store calls update listener', () => {
         const { getMount, children } = setup();
         storeStateMock.getState.mockReturnValue({ count: 1 });
-        const instance = getMount().instance();
+        const { instance } = getMount();
         storeStateMock.getState.mockReturnValue({ count: 2 });
         instance.onUpdate();
         expect(children).toHaveBeenCalledTimes(2);
@@ -149,7 +160,7 @@ describe('Subscriber', () => {
         const { getMount } = setup();
         const unsubscribeMock = jest.fn();
         storeStateMock.subscribe.mockReturnValue(unsubscribeMock);
-        const instance = getMount().instance();
+        const { instance } = getMount();
         expect(instance.subscription).toEqual({
           store: instance.store,
           remove: unsubscribeMock,
@@ -173,7 +184,7 @@ describe('Subscriber', () => {
       it('should re-render children with selected return value', () => {
         Subscriber.selector = jest.fn().mockReturnValue({ foo: 1 });
         const { getMount, children } = setup();
-        const instance = getMount().instance();
+        const { instance } = getMount();
         Subscriber.selector.mockReturnValue({ foo: 2 });
         storeStateMock.getState.mockReturnValue({ count: 1 });
         instance.onUpdate();
@@ -181,26 +192,55 @@ describe('Subscriber', () => {
         Subscriber.selector = undefined;
       });
 
-      it('should not update on state change if selector output is equal', () => {
-        Subscriber.selector = jest.fn().mockReturnValue({ foo: 1 });
+      it('should update on state change if selector output is not shallow equal', () => {
+        Subscriber.selector = jest
+          .fn()
+          .mockImplementation(() => ({ foo: [1] }));
         const { getMount, children } = setup();
-        const instance = getMount().instance();
+        const { instance } = getMount();
+        storeStateMock.getState.mockReturnValue({ count: 1 });
+        instance.onUpdate();
+        expect(children).toHaveBeenCalledTimes(2);
+        Subscriber.selector = undefined;
+      });
+
+      it('should not update on state change if selector output is shallow equal', () => {
+        Subscriber.selector = jest.fn().mockImplementation(() => ({ foo: 1 }));
+        const { getMount, children } = setup();
+        const { instance } = getMount();
         storeStateMock.getState.mockReturnValue({ count: 1 });
         instance.onUpdate();
         expect(children).toHaveBeenCalledTimes(1);
-        // check that on state change memoisation breaks
+        // ensure that on state change memoisation breaks
         expect(Subscriber.selector).toHaveBeenCalledTimes(2);
+        Subscriber.selector = undefined;
+      });
+
+      it('should not recompute selector if state & props are equal', () => {
+        Subscriber.selector = jest.fn().mockReturnValue({ foo: 1 });
+        const { getElement, children } = setup();
+        class App extends Component {
+          render() {
+            return getElement();
+          }
+        }
+        const wrapper = mount(<App />);
+        wrapper.setProps({ foo: 1 });
+        expect(children).toHaveBeenCalledTimes(2);
+
+        // ensure memoisation works
+        expect(Subscriber.selector).toHaveBeenCalledTimes(1);
         Subscriber.selector = undefined;
       });
 
       it('should not update on state change if selector is null', () => {
         Subscriber.selector = null;
         const { getMount, children } = setup();
-        const instance = getMount().instance();
+        const { instance } = getMount();
         storeStateMock.getState.mockReturnValue({ count: 1 });
         instance.onUpdate();
         expect(children).toHaveBeenCalledTimes(1);
-        expect(children).toHaveBeenCalledWith({}, actions);
+        expect(children).toHaveBeenCalledWith(undefined, actions);
         Subscriber.selector = undefined;
       });
     });

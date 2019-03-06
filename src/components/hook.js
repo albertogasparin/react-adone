@@ -1,10 +1,12 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { readContext } from '../context';
 import memoize from '../utils/memoize';
+import shallowEqual from '../utils/shallow-equal';
 
-const EMPTY_STATE = {};
+const EMPTY_SELECTOR = () => undefined;
+const DEFAULT_SELECTOR = state => state;
 
-export function createHook(Store, selector = state => state) {
+export function createHook(Store, selector) {
   return function(props) {
     // instead of using "useContext" we get the context value with
     // a custom implementation so our components do not render on ctx change
@@ -15,7 +17,9 @@ export function createHook(Store, selector = state => state) {
     // Otherwise always return same value, as we ignore state
     const stateSelector = selector
       ? useCallback(memoize(selector), [])
-      : () => EMPTY_STATE;
+      : selector === null
+      ? EMPTY_SELECTOR
+      : DEFAULT_SELECTOR;
 
     const currentState = stateSelector(storeState.getState(), props);
     let [prevState, setState] = useState(currentState);
@@ -26,7 +30,7 @@ export function createHook(Store, selector = state => state) {
     const onUpdateRef = useRef();
     onUpdateRef.current = updState => {
       const nextState = stateSelector(updState, props);
-      if (nextState !== currentState) {
+      if (!shallowEqual(nextState, currentState)) {
         setState(nextState);
       }
     };
