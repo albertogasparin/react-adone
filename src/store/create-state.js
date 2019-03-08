@@ -12,9 +12,8 @@ function createStoreState(key, initialState) {
     },
     setState(nextState) {
       currentState = nextState;
-      for (let i = 0, l = listeners.length; i < l; i++) {
-        listeners[i](currentState);
-      }
+      // warn: listeners might mutate while looping
+      listeners.forEach(listener => listener(currentState));
     },
     subscribe(listener) {
       listeners.push(listener);

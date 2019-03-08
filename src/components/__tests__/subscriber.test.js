@@ -162,7 +162,7 @@ describe('Subscriber', () => {
         storeStateMock.subscribe.mockReturnValue(unsubscribeMock);
         const { instance } = getMount();
         expect(instance.subscription).toEqual({
-          store: instance.store,
+          storeState: instance.store.storeState,
           remove: unsubscribeMock,
         });
         instance.componentWillUnmount();

@@ -86,15 +86,16 @@ export default class Subscriber extends Component {
   }
 
   subscribeToUpdates() {
+    const { storeState } = this.store;
     // in case store has been recreated during an update (due to scope change)
-    if (this.subscription && this.subscription.store !== this.store) {
+    if (this.subscription && this.subscription.storeState !== storeState) {
       this.subscription.remove();
       this.subscription = null;
     }
     if (!this.subscription) {
       this.subscription = {
-        store: this.store,
-        remove: this.store.storeState.subscribe(this.onUpdate),
+        storeState,
+        remove: storeState.subscribe(this.onUpdate),
       };
     }
   }
