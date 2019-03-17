@@ -1,6 +1,6 @@
 {
   "name": "react-adone",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "State management for React build on top of immer and Context (optional)",
   "keywords": [
     "React",
