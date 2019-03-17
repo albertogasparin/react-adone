@@ -57,6 +57,10 @@ export default class Container extends Component {
 
   componentDidUpdate(prevProps) {
     if (this.props.scope !== prevProps.scope) {
+      // Trigger a forced update on all subscribers
+      // as render might have been blocked
+      this.triggerScopeChange(prevProps.scope);
+      // Check if instance has still subscribers, if not delete
       this.deleteScopedStore(prevProps.scope);
     }
   }
@@ -131,6 +135,18 @@ export default class Container extends Component {
       storeState,
       actions: this.state.scopedActions,
     };
+  }
+
+  triggerScopeChange(prevScopeId) {
+    const { storeType } = this.constructor;
+    const { storeState } = this.getScopedStore(storeType, prevScopeId);
+    // When called, subscribers that have already re-rendered with the new
+    // scope are no longer subscribed to the old one, so we "force update"
+    // the remaining.
+    // This is sub-optimal as if there are other containers with the same
+    // old scope id we will re-render those too, but detecting children only
+    // might be more expensive
+    storeState.listeners().forEach(updateFn => updateFn(undefined, true));
   }
 
   deleteScopedStore(scopeId = this.props.scope) {

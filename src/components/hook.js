@@ -28,9 +28,9 @@ export function createHook(Store, selector) {
     // React setState in useEffect provides a stale state unless we re-subscribe
     // https://github.com/facebook/react/issues/14042
     const onUpdateRef = useRef();
-    onUpdateRef.current = updState => {
+    onUpdateRef.current = (updState = prevState, forceUpdate) => {
       const nextState = stateSelector(updState, props);
-      if (!shallowEqual(nextState, currentState)) {
+      if (!shallowEqual(nextState, currentState) || forceUpdate) {
         setState(nextState);
       }
     };
@@ -44,7 +44,7 @@ export function createHook(Store, selector) {
 
     useEffect(() => {
       // we call the current ref fn so state is fresh
-      const onUpdate = updState => onUpdateRef.current(updState);
+      const onUpdate = (...args) => onUpdateRef.current(...args);
       // after component is mounted or store changed, we subscribe
       const unsubscribe = storeState.subscribe(onUpdate);
       return () => {

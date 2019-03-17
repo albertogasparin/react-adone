@@ -100,13 +100,16 @@ export default class Subscriber extends Component {
     }
   }
 
-  onUpdate = () => {
+  onUpdate = (updState, forceUpdate) => {
     // Ensure component is still mounted and has a store attached
     if (!this.store) return;
     const prevStoreStateValue = this.state.storeStateValue;
     const nextStoreStateValue = this.getStoreStateValue();
-    // Only update if state changed
-    if (!shallowEqual(prevStoreStateValue, nextStoreStateValue)) {
+    // Only update if state changed or if container triggered
+    if (
+      !shallowEqual(prevStoreStateValue, nextStoreStateValue) ||
+      forceUpdate
+    ) {
       // nextState will recalculated by gDSFP anyway
       this.setState({ storeStateValue: nextStoreStateValue });
     }
