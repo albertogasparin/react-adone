@@ -36,7 +36,7 @@
   "dependencies": {},
   "peerDependencies": {
     "prop-types": "^15.0.0",
-    "react": "^16.0.0"
+    "react": "^16.4.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.2.0",
@@ -55,19 +55,20 @@
     "babel-loader": "^8.0.5",
     "docsify-cli": "~4.3.0",
     "enzyme": "~3.9.0",
-    "enzyme-adapter-react-16": "~1.10.0",
-    "eslint": "^5.14.0",
+    "enzyme-adapter-react-16": "^1.11.2",
+    "eslint": "^5.15.2",
     "eslint-plugin-flowtype": "^3.4.2",
     "eslint-plugin-import": "^2.16.0",
     "eslint-plugin-react": "^7.12.4",
-    "flow-bin": "~0.93.0",
+    "eslint-plugin-react-hooks": "^1.5.1",
+    "flow-bin": "^0.95.1",
     "flow-copy-source": "^2.0.3",
-    "jest": "~24.1.0",
+    "jest": "^24.5.0",
     "prettier": "^1.16.4",
     "prop-types": "~15.7.2",
-    "react": "~16.8.2",
-    "react-dom": "~16.8.2",
-    "webpack": "^4.29.4",
+    "react": "^16.8.4",
+    "react-dom": "^16.8.4",
+    "webpack": "^4.29.6",
     "webpack-cli": "^3.2.3",
     "webpack-dev-server": "^3.1.14"
   }

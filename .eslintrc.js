@@ -21,7 +21,7 @@ module.exports = {
       version: 'latest',
     },
   },
-  plugins: ['react', 'flowtype', 'import'],
+  plugins: ['react', 'react-hooks', 'flowtype', 'import'],
   rules: {
     'no-shadow': ['error'],
     indent: ['off'],
@@ -29,5 +29,8 @@ module.exports = {
     quotes: ['off'],
     semi: ['off'],
     'react/no-direct-mutation-state': ['off'],
+    'react/display-name': ['off'],
+    'react-hooks/rules-of-hooks': ['error'],
+    'react-hooks/exhaustive-deps': ['warn'],
   },
 };
