@@ -59,8 +59,8 @@ The power of `Container` is that you can expand or reduce the scope at will, wit
 Containers enable a couple of additional properties:
 
 - If two Container of the same time have the same `scope` they will share the same data
-- Instances created by Containers without `isGlobal` are automatically cleared once all Subscribers/hooks are removed from the tree
+- Store instances created by Containers without `isGlobal` are automatically cleared once the last Container accessing that Store is unmounted
 - Props provided to containers are passed to Store actions as second parameter [see actions API](../api/actions.md)
 - Containers can have a `onInit` and `onUpdate` methods to trigger actions and update the state on Container props change
 
-For more details about Containers see the [Containers API](../api/conrainer.md)
+For more details about Containers see the [Containers API](../api/container.md)
