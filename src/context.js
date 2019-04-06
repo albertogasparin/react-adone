@@ -12,11 +12,13 @@ const { Provider, Consumer } = React.createContext({
 // plus a fix to make it work with enzyme shallow
 const readContext = () => {
   const {
-    ReactCurrentOwner: { currentDispatcher },
+    // React < 16.8
+    ReactCurrentOwner: { currentDispatcher } = {},
+    // React >= 16.8+
+    ReactCurrentDispatcher: { current } = {},
   } = React.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED;
-  return currentDispatcher
-    ? currentDispatcher.readContext(Consumer)
-    : Consumer._currentValue;
+  const dispatcher = current || currentDispatcher;
+  return dispatcher ? dispatcher.readContext(Consumer) : Consumer._currentValue;
 };
 
 export { Provider, Consumer, readContext };
