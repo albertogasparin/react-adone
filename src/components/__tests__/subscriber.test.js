@@ -1,7 +1,7 @@
 /* eslint-env jest */
 
 import React, { Component } from 'react';
-import { shallow, mount } from 'enzyme';
+import { mount } from 'enzyme';
 
 import { StoreMock, storeStateMock } from '../../__tests__/mocks';
 import SubscriberComponent from '../subscriber';
@@ -37,19 +37,12 @@ describe('Subscriber', () => {
           <Subscriber {...props}>{children}</Subscriber>
         </AdoneProvider>
       );
-      const getShallow = () => {
-        const component = shallow(getElement())
-          .childAt(0)
-          .shallow();
-        return { component, instance: component.instance() };
-      };
       const getMount = () => {
         const component = mount(getElement()).childAt(0);
         return { component, instance: component.instance() };
       };
       return {
         getElement,
-        getShallow,
         getMount,
         children,
       };
@@ -57,17 +50,12 @@ describe('Subscriber', () => {
     withoutProvider: (props = {}) => {
       const children = jest.fn().mockReturnValue(null);
       const getElement = () => <Subscriber {...props}>{children}</Subscriber>;
-      const getShallow = () => {
-        const component = shallow(getElement());
-        return { component, instance: component.instance() };
-      };
       const getMount = () => {
         const component = mount(getElement());
         return { component, instance: component.instance() };
       };
       return {
         getElement,
-        getShallow,
         getMount,
         children,
       };
@@ -88,16 +76,16 @@ describe('Subscriber', () => {
       });
 
       it('should get the store instance from registry', () => {
-        const { getShallow } = setup();
-        getShallow();
+        const { getMount } = setup();
+        getMount();
         // we check defaultRegistry even when provider is used
         // as the mock is the same
         expect(defaultRegistry.getStore).toHaveBeenCalledWith(StoreMock);
       });
 
       it('should save store instance locally and listen', () => {
-        const { getShallow } = setup();
-        const { instance } = getShallow();
+        const { getMount } = setup();
+        const { instance } = getMount();
         expect(instance.store).toEqual({
           storeState: storeStateMock,
           actions: expect.any(Object),
@@ -108,8 +96,8 @@ describe('Subscriber', () => {
       });
 
       it('should render children with store data and actions', () => {
-        const { getShallow, children } = setup();
-        getShallow();
+        const { getMount, children } = setup();
+        getMount();
         expect(children).toHaveBeenCalledTimes(1);
         expect(children).toHaveBeenCalledWith({ count: 0 }, actions);
       });
